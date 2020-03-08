@@ -3,14 +3,17 @@
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
-    glTranslatef(x,y,0.0f);
-	for (int i=0;i<Max_Y;i++){
-		for (int j=0;j<Max_X;j++){
-			Map_Texture(Img_Path[Map_Path[i][j]]);
-			Draw_Rect(&Rct_Map[i][j]);
-		}
-	}
-	Player.Draw();
+    glTranslatef(x, y, 0.0f);
+    for (int i = 0; i < Max_Y; i++) {
+        for (int j = 0; j < Max_X; j++) {
+            Map_Texture(Img_Path[Map_Path[i][j]]);
+            Draw_Rect(&Rct_Map[i][j]);
+        }
+    }
+    for(c_Enemy *enemy : Enemy) {
+        enemy->Draw();
+    }
+    Player.Draw();
     glutSwapBuffers();
 }
 
@@ -25,22 +28,31 @@ void Keyboard(GLubyte key, int x, int y) {
 void Special(int key, int x, int y) {
     switch (key) {
     case GLUT_KEY_UP:
-    	Player.Move(UP);
+        Player.Move(UP);
         break;
     case GLUT_KEY_RIGHT:
-    	Player.Move(RIGHT);
+        Player.Move(RIGHT);
         break;
     case GLUT_KEY_DOWN:
-    	Player.Move(DOWN);
+        Player.Move(DOWN);
         break;
     case GLUT_KEY_LEFT:
-    	Player.Move(LEFT);
+        Player.Move(LEFT);
         break;
     }
 }
 
 void Timer(int value) {
-	Player.Action();
+    if (Turn == TURN_PLAYER)
+        Player.Update();
+    else {
+        for(c_Enemy *enemy : Enemy) {
+            enemy->Update();
+        }
+        Enemy_Stt++;
+        if (Enemy_Stt == 6)
+            Turn = TURN_PLAYER;
+    }
     glutPostRedisplay();
     glutTimerFunc(INTERVAL, Timer, 0);
 }
@@ -57,7 +69,7 @@ int main(int argc, char **argv) {
     Init_GL();
     glutDisplayFunc(Display);
     glutSpecialFunc(Special);
-    glutTimerFunc(0,Timer,0);
+    glutTimerFunc(0, Timer, 0);
     glutMainLoop();
     return 0;
 }

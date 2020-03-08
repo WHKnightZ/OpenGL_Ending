@@ -28,8 +28,8 @@ Folders=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
-CompilerSettings=0000000100000000000000000
-UnitCount=4
+CompilerSettings=00000001c0000000000000000
+UnitCount=6
 
 [VersionInfo]
 Major=1
@@ -89,4 +89,24 @@ Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+
+[Unit5]
+FileName=cPlayer.cpp
+CompileCpp=1
+Folder=
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=$(CPP) -c cPlayer.cpp -o cPlayer.o $(CXXFLAGS)
+
+[Unit6]
+FileName=cEnemy.cpp
+CompileCpp=1
+Folder=
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=$(CPP) -c cEnemy.cpp -o cEnemy.o $(CXXFLAGS)
 
