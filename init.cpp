@@ -104,6 +104,31 @@ void Load_Map() {
                 Map_Path[i][j] = -1;
         }
     }
+    int Enemy_Count, Enemy_Type, x, y, Drt;
+    fscanf(f, "%d%d", &x, &y);
+    Player.Init(x, y);
+    fscanf(f, "%d", &Enemy_Count);
+    for (int i = 0; i < Enemy_Count; i++) {
+        fscanf(f, "%d", &Enemy_Type);
+        switch(Enemy_Type) {
+        case 0:
+            fscanf(f, "%d%d", &x, &y);
+            Enemy.push_back(new c_Enemy_Wall(x, y));
+            break;
+        case 1:
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Enemy_Stand_1(x, y, Drt));
+            break;
+        case 2:
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Enemy_Stand_2(x, y, Drt));
+            break;
+        case 3:
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Enemy_Move_1(x, y, Drt));
+            break;
+        }
+    }
     fclose(f);
 }
 
@@ -128,7 +153,6 @@ void Init_Game() {
         }
     }
     Init_Image_Path();
-    Load_Map();
 
     c_Player::Init_Image();
 
@@ -137,14 +161,8 @@ void Init_Game() {
     c_Enemy_Stand_2::Init_Image();
     c_Enemy_Move_1::Init_Image();
 
-//    Enemy.push_back(new c_Enemy_Wall(3, 2));
-//    Enemy.push_back(new c_Enemy_Stand_1(5, 1, DOWN));
-//    Enemy.push_back(new c_Enemy_Stand_1(5, 3, UP));
-    Enemy.push_back(new c_Enemy_Move_1(5, 2, 0));
-    Enemy.push_back(new c_Enemy_Move_1(5, 1, 0));
-    Enemy.push_back(new c_Enemy_Move_1(5, 3, 0));
+    Load_Map();
 
-    Player.Init(2, 2);
     Reload_Translate();
 }
 

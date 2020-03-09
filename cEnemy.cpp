@@ -118,33 +118,30 @@ bool c_Enemy_Move_1::BFS() {
 }
 
 void c_Enemy_Move_1::Action() {
+    Is_Move = Is_Rotate = false;
     int Tmp = Drt_Find[0];
     Drt_Find[0] = Drt_Find[Drt];
     Drt_Find[Drt] = Tmp;
     if (BFS()) {
         if (Drt_Next != Drt) {
             Is_Rotate = true;
-            Is_Move = false;
         } else {
+            x += Drt_Offset[Drt].x;
+            y += Drt_Offset[Drt].y;
             Is_Move = true;
-            Is_Rotate = false;
         }
     } else {
-        Drt_Next = Drt_Find[0];
-        int H = Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y), H2;
-        for (int i = 1; i < 4; i++) {
-            H2 = Heuristic(x + Drt_Offset[Drt_Find[i]].x, y + Drt_Offset[Drt_Find[i]].y);
-            if (H > H2) {
-                H = H2;
-                Drt_Next = Drt_Find[i];
-            }
-        }
-    }
-    if (Drt_Next == Drt_Reverse[Drt]) {
-        int Drt_Prev = Drt_Loop_Prev[Drt];
-        Drt_Next = Drt_Loop_Next[Drt];
-        if (Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y) > Heuristic(x + Drt_Offset[Drt_Prev].x, y + Drt_Offset[Drt_Prev].y))
-            Drt_Next = Drt_Prev;
+//        Drt_Next = Drt_Find[0];
+//        int H = Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y), H2;
+//        for (int i = 1; i < 4; i++) {
+//            H2 = Heuristic(x + Drt_Offset[Drt_Find[i]].x, y + Drt_Offset[Drt_Find[i]].y);
+//            if (H > H2) {
+//                H = H2;
+//                Drt_Next = Drt_Find[i];
+//            }
+//        }
+//        if (Drt_Next != Drt)
+//            Is_Rotate = true;
     }
     Tmp = Drt_Find[0];
     Drt_Find[0] = Drt_Find[Drt];
@@ -169,10 +166,6 @@ void c_Enemy_Move_1::Update() {
     } else if (Is_Move) {
         xf += Drt_Offset[Drt].x * Offset_Forward[Enemy_Stt];
         yf += Drt_Offset[Drt].y * Offset_Forward[Enemy_Stt];
-        if (Enemy_Stt == 5) {
-            x += Drt_Offset[Drt].x;
-            y += Drt_Offset[Drt].y;
-        }
         Update_Rect();
     }
 }
@@ -209,6 +202,11 @@ void c_Enemy_Move_1::Init_Image() {
     Img_Rotate_Save[UP][LEFT] = Img_Rotate_Save[LEFT][UP];
     Img_Rotate_Save[DOWN][RIGHT] = Img_Rotate_Save[RIGHT][DOWN];
     Img_Rotate_Save[LEFT][DOWN] = Img_Rotate_Save[DOWN][LEFT];
+
+    Img_Rotate_Save[UP][DOWN] = Img_Save[RIGHT];
+    Img_Rotate_Save[DOWN][UP] = Img_Save[LEFT];
+    Img_Rotate_Save[RIGHT][LEFT] = Img_Save[DOWN];
+    Img_Rotate_Save[LEFT][RIGHT] = Img_Save[UP];
 
 }
 
