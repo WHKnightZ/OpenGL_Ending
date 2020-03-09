@@ -61,7 +61,7 @@ enum DIRECTION {
     LEFT
 };
 
-enum AXIS{
+enum AXIS {
     VERTICAL,
     HORIZONTAL
 };
@@ -71,16 +71,20 @@ enum TURN {
     TURN_ENEMY
 };
 
-enum MOVE_STATE{
-	CAN_MOVE,
-	OBSTACLE_WALL,
-	OBSTACLE_ENEMY
+enum MOVE_STATE {
+    CAN_MOVE,
+    OBSTACLE_WALL,
+    OBSTACLE_ENEMY
 };
 
 int Turn = TURN_PLAYER;
 
 struct s_Point {
     int x, y;
+    void Reload(int x, int y) {
+        this->x = x;
+        this->y = y;
+    }
 };
 
 s_Point Drt_Offset[] = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
@@ -89,10 +93,19 @@ GLubyte Color_Shadow[] = {0, 0, 0, 255};
 float Offset_Forward[] = {24.0f, 16.0f, 8.0f, 0.0f, 0.0f, 0.0f};
 float Offset_Back[] = {24.0f, -16.0f, -8.0f, 0.0f, 0.0f, 0.0f};
 
+bool Mark[MAX_Y][MAX_X];
+s_Point Queue[MAX_Y * MAX_X];
+int Queue_Current, Queue_Last;
+int Drt_Back[MAX_Y][MAX_X];
+int Drt_Reverse[] = {DOWN, LEFT, UP, RIGHT};
+int Drt_Loop_Prev[] = {LEFT, UP, RIGHT, DOWN};
+int Drt_Loop_Next[] = {RIGHT, DOWN, LEFT, UP};
+
 void Reload_Translate();
 void Create_Image_Shadow(Image *in, Image *out);
 void Hit_Enemy(int x, int y);
-int Heuristic(int &x, int &y);
+int Check_Move(int x, int y);
+int Heuristic(int x, int y);
 
 class c_Player {
 public:
@@ -114,13 +127,6 @@ public:
 };
 
 Image c_Player::Img_Save;
-
-void c_Player::Init_Image() {
-    Image Img_Tmp;
-    Load_Texture(&Img_Tmp, "Images/Player.png");
-    Create_Image_Shadow(&Img_Tmp, &Img_Save);
-    Delete_Image(&Img_Tmp);
-}
 
 c_Player Player;
 
@@ -152,25 +158,11 @@ public:
     static float Img_Offset;
     static void Init_Image();
 
-    c_Enemy_Wall(int x, int y): c_Enemy(x, y) {
-        Img = &Img_Save;
-        Rct.Left = xf + Img_Offset;
-        Rct.Right = Rct.Left + Img->w;
-        Rct.Bottom = yf + Img_Offset;
-        Rct.Top = Rct.Bottom + Img->h;
-    }
+    c_Enemy_Wall(int x, int y);
 };
 
 Image c_Enemy_Wall::Img_Save;
 float c_Enemy_Wall::Img_Offset;
-
-void c_Enemy_Wall::Init_Image() {
-    Image Img_Tmp;
-    Load_Texture(&Img_Tmp, "Images/Wall.png");
-    Create_Image_Shadow(&Img_Tmp, &Img_Save);
-    Delete_Image(&Img_Tmp);
-    Img_Offset = (TILE_SIZE - Img_Save.w) / 2;
-}
 
 class c_Enemy_Stand_1: public c_Enemy {
 public:
@@ -180,35 +172,11 @@ public:
 
     int Drt;
 
-    c_Enemy_Stand_1(int x, int y, int Drt): c_Enemy(x, y) {
-        this->Drt = Drt;
-        Img = &Img_Save[Drt];
-        Rct.Left = xf + Img_Offset;
-        Rct.Right = Rct.Left + Img->w;
-        Rct.Bottom = yf + Img_Offset;
-        Rct.Top = Rct.Bottom + Img->h;
-    }
+    c_Enemy_Stand_1(int x, int y, int Drt);
 };
 
 Image c_Enemy_Stand_1::Img_Save[4];
 float c_Enemy_Stand_1::Img_Offset;
-
-void c_Enemy_Stand_1::Init_Image() {
-    Image Img_Tmp, Img_Tmp_2;
-    Load_Texture(&Img_Tmp, "Images/Enemy_Stand_1.png");
-    Create_Image_Shadow(&Img_Tmp, &Img_Save[UP]);
-    Rotate_Left(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[LEFT]);
-    Delete_Image(&Img_Tmp_2);
-    Rotate_Right(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[RIGHT]);
-    Delete_Image(&Img_Tmp_2);
-    Rotate_180(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[DOWN]);
-    Delete_Image(&Img_Tmp_2);
-    Img_Offset = (TILE_SIZE - Img_Save[UP].w) / 2;
-    Delete_Image(&Img_Tmp);
-}
 
 class c_Enemy_Stand_2: public c_Enemy {
 public:
@@ -218,106 +186,36 @@ public:
 
     int Drt;
 
-    c_Enemy_Stand_2(int x, int y, int Drt): c_Enemy(x, y) {
-        this->Drt = Drt;
-        Img = &Img_Save[Drt];
-        Rct.Left = xf + Img_Offset;
-        Rct.Right = Rct.Left + Img->w;
-        Rct.Bottom = yf + Img_Offset;
-        Rct.Top = Rct.Bottom + Img->h;
-    }
+    c_Enemy_Stand_2(int x, int y, int Drt);
 };
 
 Image c_Enemy_Stand_2::Img_Save[2];
 float c_Enemy_Stand_2::Img_Offset;
-
-void c_Enemy_Stand_2::Init_Image() {
-    Image Img_Tmp, Img_Tmp_2;
-    Load_Texture(&Img_Tmp, "Images/Enemy_Stand_2.png");
-    Create_Image_Shadow(&Img_Tmp, &Img_Save[VERTICAL]);
-    Rotate_Right(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[HORIZONTAL]);
-    Delete_Image(&Img_Tmp_2);
-    Img_Offset = (TILE_SIZE - Img_Save[VERTICAL].w) / 2;
-    Delete_Image(&Img_Tmp);
-}
 
 class c_Enemy_Move_1: public c_Enemy {
 public:
     static Image Img_Save[4];
     static Image Img_Rotate_Save[4][4];
     static float Img_Offset;
+    static int Drt_Find[4];
+    static int Drt_Max;
     static void Init_Image();
 
     int Drt, Drt_Next;
-    bool Is_Move,Is_Rotate;
+    bool Is_Move, Is_Rotate;
 
-    c_Enemy_Move_1(int x, int y, int Drt): c_Enemy(x, y) {
-        this->Drt = Drt;
-        Img = &Img_Save[Drt];
-        Rct.Left = xf + Img_Offset;
-        Rct.Right = Rct.Left + Img->w;
-        Rct.Bottom = yf + Img_Offset;
-        Rct.Top = Rct.Bottom + Img->h;
-        Is_Move=Is_Rotate=false;
-    }
-    
-    void Action(){
-    	Drt_Next=Drt+1;
-    	if (Drt_Next==4)
-    		Drt_Next=0;
-    	Is_Rotate=true;
-	}
-	void Update(){
-		if (Is_Rotate){
-			if (Enemy_Stt==3){
-				Img=&Img_Rotate_Save[Drt][Drt_Next];
-			}else if (Enemy_Stt==5){
-				Drt=Drt_Next;
-				Img=&Img_Save[Drt];
-			}
-		}
-	}
+    c_Enemy_Move_1(int x, int y, int Drt);
+    bool BFS();
+    void Action();
+    void Update_Rect();
+    void Update();
 };
 
 Image c_Enemy_Move_1::Img_Save[4];
 Image c_Enemy_Move_1::Img_Rotate_Save[4][4];
 float c_Enemy_Move_1::Img_Offset;
-
-void c_Enemy_Move_1::Init_Image() {
-    Image Img_Tmp, Img_Tmp_2;
-    Load_Texture(&Img_Tmp, "Images/Enemy_Move_1.png");
-    Create_Image_Shadow(&Img_Tmp, &Img_Save[UP]);
-    Rotate_Left(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[LEFT]);
-    Delete_Image(&Img_Tmp_2);
-    Rotate_Right(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[RIGHT]);
-    Delete_Image(&Img_Tmp_2);
-    Rotate_180(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[DOWN]);
-    Delete_Image(&Img_Tmp_2);
-    Img_Offset = (TILE_SIZE - Img_Save[VERTICAL].w) / 2;
-    Delete_Image(&Img_Tmp);
-
-    Load_Texture(&Img_Tmp, "Images/Enemy_Move_1_Rotate.png");
-    Create_Image_Shadow(&Img_Tmp, &Img_Rotate_Save[UP][RIGHT]);
-    Rotate_Left(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Rotate_Save[LEFT][UP]);
-    Delete_Image(&Img_Tmp_2);
-    Rotate_Right(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Rotate_Save[RIGHT][DOWN]);
-    Delete_Image(&Img_Tmp_2);
-    Rotate_180(&Img_Tmp, &Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2, &Img_Rotate_Save[DOWN][LEFT]);
-    Delete_Image(&Img_Tmp_2);
-    Delete_Image(&Img_Tmp);
-    Img_Rotate_Save[RIGHT][UP] = Img_Rotate_Save[UP][RIGHT];
-    Img_Rotate_Save[UP][LEFT] = Img_Rotate_Save[LEFT][UP];
-    Img_Rotate_Save[DOWN][RIGHT] = Img_Rotate_Save[RIGHT][DOWN];
-    Img_Rotate_Save[LEFT][DOWN] = Img_Rotate_Save[DOWN][LEFT];
-
-}
+int c_Enemy_Move_1::Drt_Find[4] = {UP, RIGHT, DOWN, LEFT};
+int c_Enemy_Move_1::Drt_Max = 4;
 
 class c_Enemy_Move_2: public c_Enemy {
 public:
@@ -329,16 +227,6 @@ public:
 Image c_Enemy_Move_2::Img_Save;
 float c_Enemy_Move_2::Img_Offset;
 
-void c_Enemy_Move_2::Init_Image() {
-    Image Img_Tmp;
-    Load_Texture(&Img_Tmp, "Images/Wall.png");
-    Create_Image(&Img_Save, Img_Tmp.w + PIXEL_SIZE, Img_Tmp.h + PIXEL_SIZE);
-    Mix_Image_Color(&Img_Save, &Img_Tmp, PIXEL_SIZE, PIXEL_SIZE, Color_Shadow);
-    Mix_Image(&Img_Save, &Img_Tmp, 0, 0);
-    Delete_Image(&Img_Tmp);
-    Img_Offset = (TILE_SIZE - Img_Save.w) / 2;
-}
-
 class c_Enemy_Move_4: public c_Enemy {
 public:
     static Image Img_Save;
@@ -348,16 +236,6 @@ public:
 
 Image c_Enemy_Move_4::Img_Save;
 float c_Enemy_Move_4::Img_Offset;
-
-void c_Enemy_Move_4::Init_Image() {
-    Image Img_Tmp;
-    Load_Texture(&Img_Tmp, "Images/Wall.png");
-    Create_Image(&Img_Save, Img_Tmp.w + PIXEL_SIZE, Img_Tmp.h + PIXEL_SIZE);
-    Mix_Image_Color(&Img_Save, &Img_Tmp, PIXEL_SIZE, PIXEL_SIZE, Color_Shadow);
-    Mix_Image(&Img_Save, &Img_Tmp, 0, 0);
-    Delete_Image(&Img_Tmp);
-    Img_Offset = (TILE_SIZE - Img_Save.w) / 2;
-}
 
 template<class T>
 class c_Enemy_Factory: public c_Enemy {

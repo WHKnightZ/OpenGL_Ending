@@ -1,7 +1,7 @@
 #include "main.h"
 
-int Abs(int &x){
-	return x>0?x:-x;
+int Abs(int x) {
+    return x > 0 ? x : -x;
 }
 
 bool Check_Wall_Outside(int &x, int &y) {
@@ -53,11 +53,7 @@ void Create_Image_Shadow(Image *in, Image *out) {
     Mix_Image(out, in, 0, 0);
 }
 
-int Heuristic(int &x, int &y){
-	return Abs(x-Player.x)+Abs(y-Player.y);
-}
-
-int Check_Move(int x, int y){
+int Check_Move(int x, int y) {
     if (Map[y][x] == WALL)
         return OBSTACLE_WALL;
     std::vector<c_Enemy *>::iterator i = Enemy.begin();
@@ -116,6 +112,10 @@ void Reload_Translate() {
     y = CENTER_Y - (Player.yfbg + TILE_HALF);
 }
 
+int Heuristic(int x, int y) {
+    return Abs(x - Player.x) + Abs(y - Player.y);
+}
+
 void Init_Game() {
     Rect *p;
     for (int i = 0; i < MAX_Y; i++) {
@@ -137,10 +137,12 @@ void Init_Game() {
     c_Enemy_Stand_2::Init_Image();
     c_Enemy_Move_1::Init_Image();
 
-    Enemy.push_back(new c_Enemy_Wall(3, 2));
-    Enemy.push_back(new c_Enemy_Stand_1(5, 1, DOWN));
-    Enemy.push_back(new c_Enemy_Stand_1(5, 3, UP));
+//    Enemy.push_back(new c_Enemy_Wall(3, 2));
+//    Enemy.push_back(new c_Enemy_Stand_1(5, 1, DOWN));
+//    Enemy.push_back(new c_Enemy_Stand_1(5, 3, UP));
     Enemy.push_back(new c_Enemy_Move_1(5, 2, 0));
+    Enemy.push_back(new c_Enemy_Move_1(5, 1, 0));
+    Enemy.push_back(new c_Enemy_Move_1(5, 3, 0));
 
     Player.Init(2, 2);
     Reload_Translate();
