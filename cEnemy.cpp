@@ -128,13 +128,13 @@ void c_Enemy_Move_1::Action() {
         } else {
             x += Drt_Offset[Drt].x;
             y += Drt_Offset[Drt].y;
-            if (x==Player.x&&y==Player.y){
-            	c_Particle::Create_Explode(x,y,Drt);
-            	Player.Is_Alive=false;
-			}
+            if (x == Player.x && y == Player.y) {
+                c_Particle::Create_Explode(x, y, Drt);
+                Player.Is_Alive = false;
+            }
             Is_Move = true;
         }
-    } 
+    }
 //	else {
 //        Drt_Next = Drt_Find[0];
 //        int H = Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y), H2;
@@ -227,30 +227,30 @@ c_Enemy_Move_2::c_Enemy_Move_2(int x, int y, int Drt): c_Enemy(x, y) {
     Is_Move = false;
 }
 
-bool c_Enemy_Move_2::BFS(){
-	
+bool c_Enemy_Move_2::BFS() {
+
 }
 
-void c_Enemy_Move_2::Action(){
-	
+void c_Enemy_Move_2::Action() {
+
 }
 
-void c_Enemy_Move_2::Update_Rect(){
-	
+void c_Enemy_Move_2::Update_Rect() {
+
 }
 
-void c_Enemy_Move_2::Update(){
-	
+void c_Enemy_Move_2::Update() {
+
 }
-    
+
 void c_Enemy_Move_2::Init_Image() {
     Image Img_Tmp, Img_Tmp_2;
     Load_Texture(&Img_Tmp, "Images/Enemy_Move_2.png");
-    Create_Image_Shadow(&Img_Tmp,&Img_Save[UP]);
-    Img_Save[DOWN]=Img_Save[UP];
-    Rotate_Right(&Img_Tmp,&Img_Tmp_2);
-    Create_Image_Shadow(&Img_Tmp_2,&Img_Save[RIGHT]);
-    Img_Save[LEFT]=Img_Save[RIGHT];
+    Create_Image_Shadow(&Img_Tmp, &Img_Save[UP]);
+    Img_Save[DOWN] = Img_Save[UP];
+    Rotate_Right(&Img_Tmp, &Img_Tmp_2);
+    Create_Image_Shadow(&Img_Tmp_2, &Img_Save[RIGHT]);
+    Img_Save[LEFT] = Img_Save[RIGHT];
     Delete_Image(&Img_Tmp_2);
     Delete_Image(&Img_Tmp);
     Img_Offset = (TILE_SIZE - Img_Save[UP].w) / 2;

@@ -1,7 +1,7 @@
 #include "main.h"
 
 void c_Player::Init(int x, int y) {
-	Is_Alive=true;
+    Is_Alive = true;
     this->x = x;
     this->y = y;
     Is_Move = false;
@@ -40,10 +40,10 @@ void c_Player::Update_Rect() {
 }
 
 void c_Player::Draw() {
-	if (Is_Alive){
-		Map_Texture(Img);
-    	Draw_Rect(&Rct);
-	}
+    if (Is_Alive) {
+        Map_Texture(Img);
+        Draw_Rect(&Rct);
+    }
 }
 
 void c_Player::Update() {

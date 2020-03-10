@@ -109,78 +109,78 @@ void Hit_Enemy(int x, int y, int Drt);
 int Check_Move(int x, int y);
 int Heuristic(int x, int y);
 
-class c_Particle{
+class c_Particle {
 public:
-	static Image Img_Save;
-	static void Init_Image();
-	static void Create_Explode(int x, int y, int Drt);
-	bool Check_Outside();
-	
-	float xf,yf,vx,vy;
-	Rect Rct;
-	Image *Img;
-	
-	c_Particle(float x, float y, int Drt, float Velocity){
-		xf=x;
-		yf=y;
-		vx=Drt_Offset[Drt].x*Velocity;
-		vy=Drt_Offset[Drt].y*Velocity;
-		Img=&Img_Save;
-	}
-	void Update_Rect(){
-		Rct.Left = xf;
-	    Rct.Right = Rct.Left + Img->w;
-	    Rct.Bottom = yf;
-	    Rct.Top = Rct.Bottom + Img->h;
-	}
-	void Draw(){
-		Map_Texture(Img);
-    	Draw_Rect(&Rct);
-	}
-    void Update(){
-    	xf+=vx;
-    	yf+=vy;
-    	Update_Rect();
-	}
+    static Image Img_Save;
+    static void Init_Image();
+    static void Create_Explode(int x, int y, int Drt);
+    bool Check_Outside();
+
+    float xf, yf, vx, vy;
+    Rect Rct;
+    Image *Img;
+
+    c_Particle(float x, float y, int Drt, float Velocity) {
+        xf = x;
+        yf = y;
+        vx = Drt_Offset[Drt].x * Velocity;
+        vy = Drt_Offset[Drt].y * Velocity;
+        Img = &Img_Save;
+    }
+    void Update_Rect() {
+        Rct.Left = xf;
+        Rct.Right = Rct.Left + Img->w;
+        Rct.Bottom = yf;
+        Rct.Top = Rct.Bottom + Img->h;
+    }
+    void Draw() {
+        Map_Texture(Img);
+        Draw_Rect(&Rct);
+    }
+    void Update() {
+        xf += vx;
+        yf += vy;
+        Update_Rect();
+    }
 };
 
 std::vector<c_Particle *> Particle;
 
 Image c_Particle::Img_Save;
 
-void c_Particle::Init_Image(){
+void c_Particle::Init_Image() {
 //	Image Img_Tmp;
     Load_Texture(&Img_Save, "Images/Pixel.png");
 //    Create_Image_Shadow(&Img_Tmp, &Img_Save);
 //    Delete_Image(&Img_Tmp);
 }
 
-void c_Particle::Create_Explode(int x, int y, int Drt){
-	int Drt_Save=Drt;
-	float xf=x*TILE_SIZE+TILE_HALF,yf=y*TILE_SIZE+TILE_HALF;
-	float Offset_1, Offset_2;
-	Offset_1=Drt_Offset[Drt].x*8.0f;
-	Offset_2=Drt_Offset[Drt].y*8.0f;
-	for (int i=-1;i<=1;i++){
-		Particle.push_back(new c_Particle(xf+Offset_2*i,yf+Offset_1*i,Drt,2.0f*i+5.0f));
-	}
-	Drt=Drt_Loop_Prev[Drt_Save];
-	Offset_1=Drt_Offset[Drt].x*8.0f;
-	Offset_2=Drt_Offset[Drt].y*8.0f;
-	for (int i=-1;i<=1;i++){
-		Particle.push_back(new c_Particle(xf+Offset_2*i,yf+Offset_1*i,Drt,2.0f*i+5.0f));
-	}
-	Drt=Drt_Loop_Next[Drt_Save];
-	Offset_1=Drt_Offset[Drt].x*8.0f;
-	Offset_2=Drt_Offset[Drt].y*8.0f;
-	for (int i=-1;i<=1;i++){
-		Particle.push_back(new c_Particle(xf-Offset_2*i,yf-Offset_1*i,Drt,2.0f*i+5.0f));
-	}
+void c_Particle::Create_Explode(int x, int y, int Drt) {
+    int Drt_Save = Drt;
+    float xf = x * TILE_SIZE + TILE_HALF, yf = y * TILE_SIZE + TILE_HALF;
+    float Offset_1, Offset_2;
+    Offset_1 = Drt_Offset[Drt].x * 8.0f;
+    Offset_2 = Drt_Offset[Drt].y * 8.0f;
+    for (int i = -1; i <= 1; i++) {
+        Particle.push_back(new c_Particle(xf + Offset_2 * i, yf + Offset_1 * i, Drt, 2.0f * i + 5.0f));
+    }
+    Drt = Drt_Loop_Prev[Drt_Save];
+    Offset_1 = Drt_Offset[Drt].x * 8.0f;
+    Offset_2 = Drt_Offset[Drt].y * 8.0f;
+    for (int i = -1; i <= 1; i++) {
+        Particle.push_back(new c_Particle(xf + Offset_2 * i, yf + Offset_1 * i, Drt, 2.0f * i + 5.0f));
+    }
+    Drt = Drt_Loop_Next[Drt_Save];
+    Offset_1 = Drt_Offset[Drt].x * 8.0f;
+    Offset_2 = Drt_Offset[Drt].y * 8.0f;
+    for (int i = -1; i <= 1; i++) {
+        Particle.push_back(new c_Particle(xf - Offset_2 * i, yf - Offset_1 * i, Drt, 2.0f * i + 5.0f));
+    }
 }
 
-bool c_Particle::Check_Outside(){
+bool c_Particle::Check_Outside() {
 //	return (Rct.Right<-x||Rct.Left>WIDTH-x||Rct.Top<-y||Rct.Bottom>y-HEIGHT);
-	return false;
+    return false;
 }
 
 class c_Player {
@@ -301,7 +301,7 @@ public:
     static int Drt_Max;
     static int Drt_Map[4];
     static void Init_Image();
-    
+
     int Drt;
     bool Is_Move;
 
@@ -314,9 +314,9 @@ public:
 
 Image c_Enemy_Move_2::Img_Save[4];
 float c_Enemy_Move_2::Img_Offset;
-int c_Enemy_Move_2::Drt_Find[2][2]={{UP,DOWN},{RIGHT,LEFT}};
-int c_Enemy_Move_2::Drt_Max=2;
-int c_Enemy_Move_2::Drt_Map[4]={HORIZONTAL,VERTICAL,HORIZONTAL,VERTICAL};
+int c_Enemy_Move_2::Drt_Find[2][2] = {{UP, DOWN}, {RIGHT, LEFT}};
+int c_Enemy_Move_2::Drt_Max = 2;
+int c_Enemy_Move_2::Drt_Map[4] = {HORIZONTAL, VERTICAL, HORIZONTAL, VERTICAL};
 
 class c_Enemy_Move_4: public c_Enemy {
 public:

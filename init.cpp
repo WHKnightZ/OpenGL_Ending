@@ -69,7 +69,7 @@ void Hit_Enemy(int x, int y, int Drt) {
     std::vector<c_Enemy *>::iterator i = Enemy.begin();
     while (i != Enemy.end()) {
         if ((*i)->x == x && (*i)->y == y) {
-        	c_Particle::Create_Explode(x,y,Drt);
+            c_Particle::Create_Explode(x, y, Drt);
             i = Enemy.erase(i);
             return;
         } else
@@ -155,7 +155,7 @@ void Init_Game() {
     }
     Init_Image_Path();
 
-	c_Particle::Init_Image();
+    c_Particle::Init_Image();
     c_Player::Init_Image();
     c_Enemy_Wall::Init_Image();
     c_Enemy_Stand_1::Init_Image();

@@ -14,7 +14,7 @@ void Display() {
         enemy->Draw();
     }
     for (c_Particle *particle : Particle)
-    	particle->Draw();
+        particle->Draw();
     Player.Draw();
     glutSwapBuffers();
 }
@@ -57,8 +57,8 @@ void Timer(int value) {
     }
     std::vector<c_Particle *>::iterator i = Particle.begin();
     while (i != Particle.end()) {
-    	(*i)->Update();
-        if ((*i)->Check_Outside()){
+        (*i)->Update();
+        if ((*i)->Check_Outside()) {
             i = Particle.erase(i);
         } else
             i++;
