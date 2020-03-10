@@ -45,7 +45,9 @@ Rect Rct_Map[MAX_Y][MAX_X];
 int Enemy_Stt;
 
 enum GAME_STATE {
-    GAME_STT
+    GAME_STT_MENU,
+    GAME_STT_PLAY,
+    GAME_STT_OVER
 };
 
 enum PATH {
@@ -188,7 +190,7 @@ public:
 
     int x, y, Stt, Drt;
     float xf, yf, xfbg, yfbg, *o, obg;
-    bool Is_Move;
+    bool Is_Move, Is_Alive;
     int Move_Stt;
     Image *Img;
     Rect Rct;
@@ -293,13 +295,28 @@ int c_Enemy_Move_1::Drt_Max = 4;
 
 class c_Enemy_Move_2: public c_Enemy {
 public:
-    static Image Img_Save;
+    static Image Img_Save[4];
     static float Img_Offset;
+    static int Drt_Find[2][2];
+    static int Drt_Max;
+    static int Drt_Map[4];
     static void Init_Image();
+    
+    int Drt;
+    bool Is_Move;
+
+    c_Enemy_Move_2(int x, int y, int Drt);
+    bool BFS();
+    void Action();
+    void Update_Rect();
+    void Update();
 };
 
-Image c_Enemy_Move_2::Img_Save;
+Image c_Enemy_Move_2::Img_Save[4];
 float c_Enemy_Move_2::Img_Offset;
+int c_Enemy_Move_2::Drt_Find[2][2]={{UP,DOWN},{RIGHT,LEFT}};
+int c_Enemy_Move_2::Drt_Max=2;
+int c_Enemy_Move_2::Drt_Map[4]={HORIZONTAL,VERTICAL,HORIZONTAL,VERTICAL};
 
 class c_Enemy_Move_4: public c_Enemy {
 public:

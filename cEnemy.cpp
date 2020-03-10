@@ -128,9 +128,14 @@ void c_Enemy_Move_1::Action() {
         } else {
             x += Drt_Offset[Drt].x;
             y += Drt_Offset[Drt].y;
+            if (x==Player.x&&y==Player.y){
+            	c_Particle::Create_Explode(x,y,Drt);
+            	Player.Is_Alive=false;
+			}
             Is_Move = true;
         }
-    } else {
+    } 
+//	else {
 //        Drt_Next = Drt_Find[0];
 //        int H = Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y), H2;
 //        for (int i = 1; i < 4; i++) {
@@ -142,7 +147,7 @@ void c_Enemy_Move_1::Action() {
 //        }
 //        if (Drt_Next != Drt)
 //            Is_Rotate = true;
-    }
+//    }
     Tmp = Drt_Find[0];
     Drt_Find[0] = Drt_Find[Drt];
     Drt_Find[Drt] = Tmp;
@@ -212,14 +217,43 @@ void c_Enemy_Move_1::Init_Image() {
 
 // Enemy Move 2
 
+c_Enemy_Move_2::c_Enemy_Move_2(int x, int y, int Drt): c_Enemy(x, y) {
+    this->Drt = Drt;
+    Img = &Img_Save[Drt];
+    Rct.Left = xf + Img_Offset;
+    Rct.Right = Rct.Left + Img->w;
+    Rct.Bottom = yf + Img_Offset;
+    Rct.Top = Rct.Bottom + Img->h;
+    Is_Move = false;
+}
+
+bool c_Enemy_Move_2::BFS(){
+	
+}
+
+void c_Enemy_Move_2::Action(){
+	
+}
+
+void c_Enemy_Move_2::Update_Rect(){
+	
+}
+
+void c_Enemy_Move_2::Update(){
+	
+}
+    
 void c_Enemy_Move_2::Init_Image() {
-    Image Img_Tmp;
-    Load_Texture(&Img_Tmp, "Images/Wall.png");
-    Create_Image(&Img_Save, Img_Tmp.w + PIXEL_SIZE, Img_Tmp.h + PIXEL_SIZE);
-    Mix_Image_Color(&Img_Save, &Img_Tmp, PIXEL_SIZE, PIXEL_SIZE, Color_Shadow);
-    Mix_Image(&Img_Save, &Img_Tmp, 0, 0);
+    Image Img_Tmp, Img_Tmp_2;
+    Load_Texture(&Img_Tmp, "Images/Enemy_Move_2.png");
+    Create_Image_Shadow(&Img_Tmp,&Img_Save[UP]);
+    Img_Save[DOWN]=Img_Save[UP];
+    Rotate_Right(&Img_Tmp,&Img_Tmp_2);
+    Create_Image_Shadow(&Img_Tmp_2,&Img_Save[RIGHT]);
+    Img_Save[LEFT]=Img_Save[RIGHT];
+    Delete_Image(&Img_Tmp_2);
     Delete_Image(&Img_Tmp);
-    Img_Offset = (TILE_SIZE - Img_Save.w) / 2;
+    Img_Offset = (TILE_SIZE - Img_Save[UP].w) / 2;
 }
 
 // Enemy Move 4
