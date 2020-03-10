@@ -13,6 +13,8 @@ void Display() {
     for(c_Enemy *enemy : Enemy) {
         enemy->Draw();
     }
+    for (c_Particle *particle : Particle)
+    	particle->Draw();
     Player.Draw();
     glutSwapBuffers();
 }
@@ -52,6 +54,14 @@ void Timer(int value) {
         Enemy_Stt++;
         if (Enemy_Stt == 6)
             Turn = TURN_PLAYER;
+    }
+    std::vector<c_Particle *>::iterator i = Particle.begin();
+    while (i != Particle.end()) {
+    	(*i)->Update();
+        if ((*i)->Check_Outside()){
+            i = Particle.erase(i);
+        } else
+            i++;
     }
     glutPostRedisplay();
     glutTimerFunc(INTERVAL, Timer, 0);

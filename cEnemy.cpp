@@ -149,10 +149,10 @@ void c_Enemy_Move_1::Action() {
 }
 
 void c_Enemy_Move_1::Update_Rect() {
-    Rct.Left = xf;
-    Rct.Right = xf + TILE_SIZE;
-    Rct.Bottom = yf;
-    Rct.Top = yf + TILE_SIZE;
+    Rct.Left = xf + Img_Offset;
+    Rct.Right = Rct.Left + Img->w;
+    Rct.Bottom = yf + Img_Offset;
+    Rct.Top = Rct.Bottom + Img->h;
 }
 
 void c_Enemy_Move_1::Update() {

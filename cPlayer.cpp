@@ -21,7 +21,7 @@ void c_Player::Move(int Drt) {
         Move_Stt = Check_Move(x_Next, y_Next);
         if (Move_Stt != CAN_MOVE) {
             if (Move_Stt == OBSTACLE_ENEMY)
-                Hit_Enemy(x_Next, y_Next);
+                Hit_Enemy(x_Next, y_Next, Drt);
             o = Offset_Back;
             obg = 0.0f;
         } else {
