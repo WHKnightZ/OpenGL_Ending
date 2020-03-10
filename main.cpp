@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     POS_Y = (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) >> 1;
     glutInitWindowPosition(POS_X, POS_Y);
     glutInitWindowSize(WIDTH, HEIGHT);
-    glutCreateWindow("Template");
+    glutCreateWindow("Ending");
     Init_GL();
     glutDisplayFunc(Display);
     glutSpecialFunc(Special);
