@@ -5,10 +5,7 @@
 c_Enemy_Wall::c_Enemy_Wall(int x, int y): c_Enemy(x, y) {
 	Offset=Img_Offset;
     Img = &Img_Save;
-    Rct.Left = xf + Img_Offset;
-    Rct.Right = Rct.Left + Img->w;
-    Rct.Bottom = yf + Img_Offset;
-    Rct.Top = Rct.Bottom + Img->h;
+    Update_Rect();
 }
 
 void c_Enemy_Wall::Init_Image() {
@@ -22,13 +19,10 @@ void c_Enemy_Wall::Init_Image() {
 // Enemy Stand 1
 
 c_Enemy_Stand_1::c_Enemy_Stand_1(int x, int y, int Drt): c_Enemy(x, y) {
+	this->Drt = Drt;
 	Offset=Img_Offset;
-    this->Drt = Drt;
     Img = &Img_Save[Drt];
-    Rct.Left = xf + Img_Offset;
-    Rct.Right = Rct.Left + Img->w;
-    Rct.Bottom = yf + Img_Offset;
-    Rct.Top = Rct.Bottom + Img->h;
+    Update_Rect();
 }
 
 void c_Enemy_Stand_1::Init_Image() {
@@ -51,13 +45,10 @@ void c_Enemy_Stand_1::Init_Image() {
 // Enemy Stand 2
 
 c_Enemy_Stand_2::c_Enemy_Stand_2(int x, int y, int Drt): c_Enemy(x, y) {
+	this->Drt = Drt;
 	Offset=Img_Offset;
-    this->Drt = Drt;
     Img = &Img_Save[Drt];
-    Rct.Left = xf + Img_Offset;
-    Rct.Right = Rct.Left + Img->w;
-    Rct.Bottom = yf + Img_Offset;
-    Rct.Top = Rct.Bottom + Img->h;
+    Update_Rect();
 }
 
 void c_Enemy_Stand_2::Init_Image() {
@@ -74,14 +65,11 @@ void c_Enemy_Stand_2::Init_Image() {
 // Enemy Move 1
 
 c_Enemy_Move_1::c_Enemy_Move_1(int x, int y, int Drt): c_Enemy(x, y) {
+	this->Drt = Drt;
+	Is_Move = Is_Rotate = false;
 	Offset=Img_Offset;
-    this->Drt = Drt;
     Img = &Img_Save[Drt];
-    Rct.Left = xf + Img_Offset;
-    Rct.Right = Rct.Left + Img->w;
-    Rct.Bottom = yf + Img_Offset;
-    Rct.Top = Rct.Bottom + Img->h;
-    Is_Move = Is_Rotate = false;
+    Update_Rect();
 }
 
 bool c_Enemy_Move_1::BFS() {
@@ -123,9 +111,7 @@ bool c_Enemy_Move_1::BFS() {
 
 void c_Enemy_Move_1::Action() {
     Is_Move = Is_Rotate = false;
-    int Tmp = Drt_Find[0];
-    Drt_Find[0] = Drt_Find[Drt];
-    Drt_Find[Drt] = Tmp;
+    Swap(Drt_Find[0],Drt_Find[Drt]);
     if (BFS()) {
         if (Drt_Next != Drt) {
             Is_Rotate = true;
@@ -152,16 +138,7 @@ void c_Enemy_Move_1::Action() {
 //        if (Drt_Next != Drt)
 //            Is_Rotate = true;
 //    }
-    Tmp = Drt_Find[0];
-    Drt_Find[0] = Drt_Find[Drt];
-    Drt_Find[Drt] = Tmp;
-}
-
-void c_Enemy_Move_1::Update_Rect() {
-    Rct.Left = xf + Img_Offset;
-    Rct.Right = Rct.Left + Img->w;
-    Rct.Bottom = yf + Img_Offset;
-    Rct.Top = Rct.Bottom + Img->h;
+    Swap(Drt_Find[0],Drt_Find[Drt]);
 }
 
 void c_Enemy_Move_1::Update() {
@@ -222,30 +199,36 @@ void c_Enemy_Move_1::Init_Image() {
 // Enemy Move 2
 
 c_Enemy_Move_2::c_Enemy_Move_2(int x, int y, int Drt): c_Enemy(x, y) {
+	this->Drt = Drt;
+	Is_Move = false;
 	Offset=Img_Offset;
-    this->Drt = Drt;
     Img = &Img_Save[Drt];
-    Rct.Left = xf + Img_Offset;
-    Rct.Right = Rct.Left + Img->w;
-    Rct.Bottom = yf + Img_Offset;
-    Rct.Top = Rct.Bottom + Img->h;
-    Is_Move = false;
-}
-
-bool c_Enemy_Move_2::BFS() {
-
+    Update_Rect();
 }
 
 void c_Enemy_Move_2::Action() {
-
-}
-
-void c_Enemy_Move_2::Update_Rect() {
-
+	int Axis=Drt_Map_Axis[Drt];
+	int Drt2=Drt_Map[Drt];
+	Is_Move = true;
+    Swap(Drt_Find[Axis][0],Drt_Find[Axis][Drt2]);
+    int Drt_Next = Drt_Find[Axis][0];
+    int H = Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y), H2;
+    for (int i = 1; i < Drt_Max; i++) {
+        H2 = Heuristic(x + Drt_Offset[Drt_Find[Axis][i]].x, y + Drt_Offset[Drt_Find[Axis][i]].y);
+        if (H > H2) {
+            H = H2;
+            Drt_Next = Drt_Find[Axis][i];
+        }
+    }
+    Swap(Drt_Find[Axis][0],Drt_Find[Axis][Drt2]);
 }
 
 void c_Enemy_Move_2::Update() {
-
+	if (Is_Move) {
+        xf += Drt_Offset[Drt].x * Offset_Forward[Enemy_Stt];
+        yf += Drt_Offset[Drt].y * Offset_Forward[Enemy_Stt];
+        Update_Rect();
+    }
 }
 
 void c_Enemy_Move_2::Init_Image() {
@@ -263,12 +246,75 @@ void c_Enemy_Move_2::Init_Image() {
 
 // Enemy Move 4
 
+c_Enemy_Move_4::c_Enemy_Move_4(int x, int y): c_Enemy(x, y) {
+	Is_Move = false;
+	Offset=Img_Offset;
+    Img = &Img_Save;
+    Update_Rect();
+}
+
+bool c_Enemy_Move_4::BFS() {
+	for (int i = 0; i < Max_Y; i++)
+        for (int j = 0; j < Max_X; j++)
+            Mark[i][j] = false;
+    Queue_Current = Queue_Last = 0;
+    Queue[Queue_Current].Reload(x, y);
+    int x1, y1, x2, y2, Drt2;
+    while (Queue_Current <= Queue_Last) {
+        x1 = Queue[Queue_Current].x;
+        y1 = Queue[Queue_Current].y;
+        Queue_Current++;
+        for (int i = 0; i < Drt_Max; i++) {
+            Drt2 = Drt_Find[i];
+            x2 = x1 + Drt_Offset[Drt2].x;
+            y2 = y1 + Drt_Offset[Drt2].y;
+            if (x2 == Player.x && y2 == Player.y) {
+                Drt_Back[y2][x2] = Drt2;
+                while (x2 != x || y2 != y) {
+                    Drt = Drt_Back[y2][x2];
+                    x2 -= Drt_Offset[Drt].x;
+                    y2 -= Drt_Offset[Drt].y;
+                }
+                return true;
+            }
+            if (!Mark[y2][x2]) {
+                Mark[y2][x2] = true;
+                if (Check_Move(x2, y2) == CAN_MOVE) {
+                    Queue_Last++;
+                    Queue[Queue_Last].Reload(x2, y2);
+                    Drt_Back[y2][x2] = Drt2;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void c_Enemy_Move_4::Action() {
+	Is_Move = false;
+    if (BFS()) {
+        x += Drt_Offset[Drt].x;
+        y += Drt_Offset[Drt].y;
+        if (x == Player.x && y == Player.y) {
+            c_Particle::Create_Explode(x, y, Drt);
+            Player.Is_Alive = false;
+        }
+        Is_Move = true;
+    }
+}
+
+void c_Enemy_Move_4::Update() {
+	if (Is_Move) {
+        xf += Drt_Offset[Drt].x * Offset_Forward[Enemy_Stt];
+        yf += Drt_Offset[Drt].y * Offset_Forward[Enemy_Stt];
+        Update_Rect();
+    }
+}
+
 void c_Enemy_Move_4::Init_Image() {
     Image Img_Tmp;
-    Load_Texture(&Img_Tmp, "Images/Wall.png");
-    Create_Image(&Img_Save, Img_Tmp.w + PIXEL_SIZE, Img_Tmp.h + PIXEL_SIZE);
-    Mix_Image_Color(&Img_Save, &Img_Tmp, PIXEL_SIZE, PIXEL_SIZE, Color_Shadow);
-    Mix_Image(&Img_Save, &Img_Tmp, 0, 0);
+    Load_Texture(&Img_Tmp, "Images/Enemy_Move_4.png");
+    Create_Image_Shadow(&Img_Tmp, &Img_Save);
     Delete_Image(&Img_Tmp);
     Img_Offset = (TILE_SIZE - Img_Save.w) / 2;
 }

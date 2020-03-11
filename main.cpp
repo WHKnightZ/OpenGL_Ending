@@ -60,6 +60,7 @@ void Timer(int value) {
     while (i != Particle.end()) {
         (*i)->Update();
         if ((*i)->Check_Outside()) {
+        	// delete first
             i = Particle.erase(i);
         } else
             i++;

@@ -1,5 +1,11 @@
 #include "main.h"
 
+void Swap(int &x, int &y){
+	int Tmp=x;
+	x=y;
+	y=Tmp;
+}
+
 int Abs(int x) {
     return x > 0 ? x : -x;
 }
@@ -70,6 +76,7 @@ void Hit_Enemy(int x, int y, int Drt) {
     while (i != Enemy.end()) {
         if ((*i)->x == x && (*i)->y == y) {
             c_Particle::Create_Explode(x, y, Drt);
+            // delete first
             i = Enemy.erase(i);
             return;
         } else
@@ -128,6 +135,14 @@ void Load_Map() {
             fscanf(f, "%d%d%d", &x, &y, &Drt);
             Enemy.push_back(new c_Enemy_Move_1(x, y, Drt));
             break;
+        case 4:
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Enemy_Move_2(x, y, Drt));
+            break;
+        case 5:
+            fscanf(f, "%d%d", &x, &y);
+            Enemy.push_back(new c_Enemy_Move_4(x, y));
+            break;
         }
     }
     fclose(f);
@@ -161,6 +176,8 @@ void Init_Game() {
     c_Enemy_Stand_1::Init_Image();
     c_Enemy_Stand_2::Init_Image();
     c_Enemy_Move_1::Init_Image();
+    c_Enemy_Move_2::Init_Image();
+    c_Enemy_Move_4::Init_Image();
 
     Load_Map();
 

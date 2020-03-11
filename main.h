@@ -32,7 +32,7 @@
 
 int POS_X, POS_Y;
 int Max_X, Max_Y;
-int Level = 1;
+int Level = 4;
 float x, y;
 Image Img_Path_Save[2][4];
 Image *Img_Path[8];
@@ -108,6 +108,7 @@ void Create_Image_Shadow(Image *in, Image *out);
 void Hit_Enemy(int x, int y, int Drt);
 int Check_Move(int x, int y);
 int Heuristic(int x, int y);
+void Swap(int &x, int &y);
 
 class c_Unit{
 public:
@@ -115,6 +116,7 @@ public:
 	float xf,yf,Offset;
 	Rect Rct;
 	Image *Img;
+	int Stt, Drt;
 	
 	void Update_Rect() {
         Rct.Left = xf+Offset;
@@ -196,7 +198,6 @@ public:
     static Image Img_Save;
     static void Init_Image();
 
-    int Stt, Drt;
     float xfbg, yfbg, *o, obg;
     bool Is_Move, Is_Alive;
     int Move_Stt;
@@ -212,11 +213,6 @@ c_Player Player;
 
 class c_Enemy: public c_Unit {
 public:
-    int x, y, Stt, Drt;
-    float xf, yf;
-    Image *Img;
-    Rect Rct;
-
     c_Enemy(int x, int y) {
         this->x = x;
         this->y = y;
@@ -246,8 +242,6 @@ public:
     static float Img_Offset;
     static void Init_Image();
 
-    int Drt;
-
     c_Enemy_Stand_1(int x, int y, int Drt);
 };
 
@@ -259,8 +253,6 @@ public:
     static Image Img_Save[2];
     static float Img_Offset;
     static void Init_Image();
-
-    int Drt;
 
     c_Enemy_Stand_2(int x, int y, int Drt);
 };
@@ -283,7 +275,6 @@ public:
     c_Enemy_Move_1(int x, int y, int Drt);
     bool BFS();
     void Action();
-    void Update_Rect();
     void Update();
 };
 
@@ -300,15 +291,13 @@ public:
     static int Drt_Find[2][2];
     static int Drt_Max;
     static int Drt_Map[4];
+    static int Drt_Map_Axis[4];
     static void Init_Image();
 
-    int Drt;
     bool Is_Move;
 
     c_Enemy_Move_2(int x, int y, int Drt);
-    bool BFS();
     void Action();
-    void Update_Rect();
     void Update();
 };
 
@@ -316,17 +305,29 @@ Image c_Enemy_Move_2::Img_Save[4];
 float c_Enemy_Move_2::Img_Offset;
 int c_Enemy_Move_2::Drt_Find[2][2] = {{UP, DOWN}, {RIGHT, LEFT}};
 int c_Enemy_Move_2::Drt_Max = 2;
-int c_Enemy_Move_2::Drt_Map[4] = {HORIZONTAL, VERTICAL, HORIZONTAL, VERTICAL};
+int c_Enemy_Move_2::Drt_Map[4] = {0, 0, 1, 1};
+int c_Enemy_Move_2::Drt_Map_Axis[4] = {HORIZONTAL, VERTICAL, HORIZONTAL, VERTICAL};
 
 class c_Enemy_Move_4: public c_Enemy {
 public:
     static Image Img_Save;
     static float Img_Offset;
+    static int Drt_Find[4];
+    static int Drt_Max;
     static void Init_Image();
+    
+    bool Is_Move;
+    
+    c_Enemy_Move_4(int x, int y);
+    bool BFS();
+    void Action();
+    void Update();
 };
 
 Image c_Enemy_Move_4::Img_Save;
 float c_Enemy_Move_4::Img_Offset;
+int c_Enemy_Move_4::Drt_Find[4] = {UP,RIGHT,DOWN,LEFT};
+int c_Enemy_Move_4::Drt_Max = 4;
 
 template<class T>
 class c_Enemy_Factory: public c_Enemy {
