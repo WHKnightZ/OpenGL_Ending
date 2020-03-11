@@ -109,33 +109,41 @@ void Hit_Enemy(int x, int y, int Drt);
 int Check_Move(int x, int y);
 int Heuristic(int x, int y);
 
-class c_Particle {
+class c_Unit{
+public:
+	int x,y;
+	float xf,yf,Offset;
+	Rect Rct;
+	Image *Img;
+	
+	void Update_Rect() {
+        Rct.Left = xf+Offset;
+        Rct.Right = Rct.Left + Img->w;
+        Rct.Bottom = yf+Offset;
+        Rct.Top = Rct.Bottom + Img->h;
+    }
+    void Draw() {
+        Map_Texture(Img);
+        Draw_Rect(&Rct);
+    }
+};
+
+class c_Particle: public c_Unit {
 public:
     static Image Img_Save;
     static void Init_Image();
     static void Create_Explode(int x, int y, int Drt);
     bool Check_Outside();
 
-    float xf, yf, vx, vy;
-    Rect Rct;
-    Image *Img;
+    float vx, vy;
 
     c_Particle(float x, float y, int Drt, float Velocity) {
+    	Offset=0.0f;
         xf = x;
         yf = y;
         vx = Drt_Offset[Drt].x * Velocity;
         vy = Drt_Offset[Drt].y * Velocity;
         Img = &Img_Save;
-    }
-    void Update_Rect() {
-        Rct.Left = xf;
-        Rct.Right = Rct.Left + Img->w;
-        Rct.Bottom = yf;
-        Rct.Top = Rct.Bottom + Img->h;
-    }
-    void Draw() {
-        Map_Texture(Img);
-        Draw_Rect(&Rct);
     }
     void Update() {
         xf += vx;
@@ -149,10 +157,10 @@ std::vector<c_Particle *> Particle;
 Image c_Particle::Img_Save;
 
 void c_Particle::Init_Image() {
-//	Image Img_Tmp;
-    Load_Texture(&Img_Save, "Images/Pixel.png");
-//    Create_Image_Shadow(&Img_Tmp, &Img_Save);
-//    Delete_Image(&Img_Tmp);
+	Image Img_Tmp;
+    Load_Texture(&Img_Tmp, "Images/Pixel.png");
+    Create_Image_Shadow(&Img_Tmp, &Img_Save);
+    Delete_Image(&Img_Tmp);
 }
 
 void c_Particle::Create_Explode(int x, int y, int Drt) {
@@ -183,22 +191,18 @@ bool c_Particle::Check_Outside() {
     return false;
 }
 
-class c_Player {
+class c_Player: public c_Unit {
 public:
     static Image Img_Save;
     static void Init_Image();
 
-    int x, y, Stt, Drt;
-    float xf, yf, xfbg, yfbg, *o, obg;
+    int Stt, Drt;
+    float xfbg, yfbg, *o, obg;
     bool Is_Move, Is_Alive;
     int Move_Stt;
-    Image *Img;
-    Rect Rct;
 
     void Init(int x, int y);
     void Move(int Drt);
-    void Update_Rect();
-    void Draw();
     void Update();
 };
 
@@ -206,7 +210,7 @@ Image c_Player::Img_Save;
 
 c_Player Player;
 
-class c_Enemy {
+class c_Enemy: public c_Unit {
 public:
     int x, y, Stt, Drt;
     float xf, yf;
@@ -219,10 +223,6 @@ public:
         this->xf = x * TILE_SIZE;
         this->yf = y * TILE_SIZE;
         this->Stt = 0;
-    }
-    virtual void Draw() {
-        Map_Texture(Img);
-        Draw_Rect(&Rct);
     }
     virtual void Action() {}
     virtual void Update() {}

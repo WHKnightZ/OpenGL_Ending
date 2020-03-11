@@ -15,7 +15,8 @@ void Display() {
     }
     for (c_Particle *particle : Particle)
         particle->Draw();
-    Player.Draw();
+    if (Player.Is_Alive)
+		Player.Draw();
     glutSwapBuffers();
 }
 

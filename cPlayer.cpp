@@ -32,20 +32,6 @@ void c_Player::Move(int Drt) {
     }
 }
 
-void c_Player::Update_Rect() {
-    Rct.Left = xf;
-    Rct.Right = xf + TILE_SIZE;
-    Rct.Bottom = yf;
-    Rct.Top = yf + TILE_SIZE;
-}
-
-void c_Player::Draw() {
-    if (Is_Alive) {
-        Map_Texture(Img);
-        Draw_Rect(&Rct);
-    }
-}
-
 void c_Player::Update() {
     if (Is_Move) {
         if (Stt < 6) {

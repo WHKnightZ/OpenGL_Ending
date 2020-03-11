@@ -3,6 +3,7 @@
 // Enemy Wall
 
 c_Enemy_Wall::c_Enemy_Wall(int x, int y): c_Enemy(x, y) {
+	Offset=Img_Offset;
     Img = &Img_Save;
     Rct.Left = xf + Img_Offset;
     Rct.Right = Rct.Left + Img->w;
@@ -21,6 +22,7 @@ void c_Enemy_Wall::Init_Image() {
 // Enemy Stand 1
 
 c_Enemy_Stand_1::c_Enemy_Stand_1(int x, int y, int Drt): c_Enemy(x, y) {
+	Offset=Img_Offset;
     this->Drt = Drt;
     Img = &Img_Save[Drt];
     Rct.Left = xf + Img_Offset;
@@ -49,6 +51,7 @@ void c_Enemy_Stand_1::Init_Image() {
 // Enemy Stand 2
 
 c_Enemy_Stand_2::c_Enemy_Stand_2(int x, int y, int Drt): c_Enemy(x, y) {
+	Offset=Img_Offset;
     this->Drt = Drt;
     Img = &Img_Save[Drt];
     Rct.Left = xf + Img_Offset;
@@ -71,6 +74,7 @@ void c_Enemy_Stand_2::Init_Image() {
 // Enemy Move 1
 
 c_Enemy_Move_1::c_Enemy_Move_1(int x, int y, int Drt): c_Enemy(x, y) {
+	Offset=Img_Offset;
     this->Drt = Drt;
     Img = &Img_Save[Drt];
     Rct.Left = xf + Img_Offset;
@@ -218,6 +222,7 @@ void c_Enemy_Move_1::Init_Image() {
 // Enemy Move 2
 
 c_Enemy_Move_2::c_Enemy_Move_2(int x, int y, int Drt): c_Enemy(x, y) {
+	Offset=Img_Offset;
     this->Drt = Drt;
     Img = &Img_Save[Drt];
     Rct.Left = xf + Img_Offset;
