@@ -209,17 +209,26 @@ c_Enemy_Move_2::c_Enemy_Move_2(int x, int y, int Drt): c_Enemy(x, y) {
 void c_Enemy_Move_2::Action() {
     int Axis = Drt_Map_Axis[Drt];
     int Drt2 = Drt_Map[Drt];
-    Is_Move = true;
+    Is_Move = false;
     Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
-    int Drt_Next = Drt_Find[Axis][0];
-    int H = Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y), H2;
-    for (int i = 1; i < Drt_Max; i++) {
-        H2 = Heuristic(x + Drt_Offset[Drt_Find[Axis][i]].x, y + Drt_Offset[Drt_Find[Axis][i]].y);
-        if (H > H2) {
-            H = H2;
-            Drt_Next = Drt_Find[Axis][i];
-        }
+    int H,Min=99;
+    int x_Next,y_Next;
+    for (int i = 0; i < Drt_Max; i++) {
+    	x_Next=x + Drt_Offset[Drt_Find[Axis][i]].x;
+    	y_Next=y + Drt_Offset[Drt_Find[Axis][i]].y;
+    	if (Check_Move(x_Next,y_Next)==CAN_MOVE){
+    		Is_Move=true;
+    		H = Heuristic(x_Next, y_Next);
+	        if (H < Min) {
+	            Min=H;
+	            Drt = Drt_Find[Axis][i];
+	        }
+		}
     }
+    if (Is_Move){
+    	x+=Drt_Offset[Drt].x;
+    	y+=Drt_Offset[Drt].y;
+	}
     Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
 }
 

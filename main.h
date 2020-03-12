@@ -306,7 +306,7 @@ float c_Enemy_Move_2::Img_Offset;
 int c_Enemy_Move_2::Drt_Find[2][2] = {{UP, DOWN}, {RIGHT, LEFT}};
 int c_Enemy_Move_2::Drt_Max = 2;
 int c_Enemy_Move_2::Drt_Map[4] = {0, 0, 1, 1};
-int c_Enemy_Move_2::Drt_Map_Axis[4] = {HORIZONTAL, VERTICAL, HORIZONTAL, VERTICAL};
+int c_Enemy_Move_2::Drt_Map_Axis[4] = {VERTICAL, HORIZONTAL, VERTICAL, HORIZONTAL};
 
 class c_Enemy_Move_4: public c_Enemy {
 public:
