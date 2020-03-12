@@ -211,24 +211,24 @@ void c_Enemy_Move_2::Action() {
     int Drt2 = Drt_Map[Drt];
     Is_Move = false;
     Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
-    int H,Min=99;
-    int x_Next,y_Next;
+    int H, Min = 99;
+    int x_Next, y_Next;
     for (int i = 0; i < Drt_Max; i++) {
-    	x_Next=x + Drt_Offset[Drt_Find[Axis][i]].x;
-    	y_Next=y + Drt_Offset[Drt_Find[Axis][i]].y;
-    	if (Check_Move(x_Next,y_Next)==CAN_MOVE){
-    		Is_Move=true;
-    		H = Heuristic(x_Next, y_Next);
-	        if (H < Min) {
-	            Min=H;
-	            Drt = Drt_Find[Axis][i];
-	        }
-		}
+        x_Next = x + Drt_Offset[Drt_Find[Axis][i]].x;
+        y_Next = y + Drt_Offset[Drt_Find[Axis][i]].y;
+        if (Check_Move(x_Next, y_Next) == CAN_MOVE) {
+            Is_Move = true;
+            H = Heuristic(x_Next, y_Next);
+            if (H < Min) {
+                Min = H;
+                Drt = Drt_Find[Axis][i];
+            }
+        }
     }
-    if (Is_Move){
-    	x+=Drt_Offset[Drt].x;
-    	y+=Drt_Offset[Drt].y;
-	}
+    if (Is_Move) {
+        x += Drt_Offset[Drt].x;
+        y += Drt_Offset[Drt].y;
+    }
     Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
 }
 

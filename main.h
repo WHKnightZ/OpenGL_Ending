@@ -331,24 +331,25 @@ int c_Enemy_Move_4::Drt_Max = 4;
 
 class c_Factory: public c_Enemy {
 public:
-	static Image Img_Save;
+    static Image Img_Save;
     static float Img_Offset;
     static void Init_Image();
-    
-	bool Is_Create;
-	
-    c_Factory(int x, int y, int Drt):c_Enemy(x,y){
-    	Img=&Img_Save;
-    	Offset=Img_Offset;
-    	this->Drt=Drt;
-	}
+
+    bool Is_Create;
+
+    c_Factory(int x, int y, int Drt): c_Enemy(x, y) {
+        Img = &Img_Save;
+        Offset = Img_Offset;
+        this->Drt = Drt;
+        Update_Rect();
+    }
 };
 
 Image c_Factory::Img_Save;
 float c_Factory::Img_Offset;
 
-void c_Factory::Init_Image(){
-	Image Img_Tmp;
+void c_Factory::Init_Image() {
+    Image Img_Tmp;
     Load_Texture(&Img_Tmp, "Images/Factory.png");
     Create_Image_Shadow(&Img_Tmp, &Img_Save);
     Delete_Image(&Img_Tmp);
@@ -358,20 +359,23 @@ void c_Factory::Init_Image(){
 std::vector<c_Enemy *> Enemy;
 std::vector<c_Enemy *> Enemy_Create;
 
-class c_Factory_Move_1:public c_Factory{
+class c_Factory_Move_1: public c_Factory {
 public:
-	c_Factory_Move_1(int x, int y, int Drt):c_Factory(x,y,Drt){
-	}
-	void Action(){
-		if (Check_Move(x+Drt_Offset[Drt].x,y+Drt_Offset[Drt].y)==CAN_MOVE){
-			c_Enemy_Move_1 *e=new c_Enemy_Move_1(x,y,Drt);
-			e->Is_Move=true;
-			Enemy_Create.push_back(e);
-		}
-	}
-	void Update(){
-		
-	}
+    c_Factory_Move_1(int x, int y, int Drt): c_Factory(x, y, Drt) {
+    }
+    void Action() {
+        int x_Next = x + Drt_Offset[Drt].x, y_Next = y + Drt_Offset[Drt].y;
+        if (Check_Move(x_Next, y_Next) == CAN_MOVE) {
+            c_Enemy_Move_1 *e = new c_Enemy_Move_1(x, y, Drt);
+            e->Is_Move = true;
+            e->x = x_Next;
+            e->y = y_Next;
+            Enemy_Create.push_back(e);
+        }
+    }
+    void Update() {
+
+    }
 };
 
 // Prototype

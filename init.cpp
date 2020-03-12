@@ -181,7 +181,7 @@ void Init_Game() {
     c_Factory::Init_Image();
 
     Load_Map();
-    Enemy.push_back(new c_Factory_Move_1(2,1,1));
+    Enemy.push_back(new c_Factory_Move_1(4, 1, 3));
 
     Reload_Translate();
 }
