@@ -178,8 +178,10 @@ void Init_Game() {
     c_Enemy_Move_1::Init_Image();
     c_Enemy_Move_2::Init_Image();
     c_Enemy_Move_4::Init_Image();
+    c_Factory::Init_Image();
 
     Load_Map();
+    Enemy.push_back(new c_Factory_Move_1(2,1,1));
 
     Reload_Translate();
 }

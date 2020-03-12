@@ -53,6 +53,8 @@ void c_Player::Update() {
                 for(c_Enemy *enemy : Enemy) {
                     enemy->Action();
                 }
+                Enemy.insert(Enemy.end(),Enemy_Create.begin(),Enemy_Create.end());
+                Enemy_Create.clear();
             }
             Is_Move = false;
         }

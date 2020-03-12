@@ -118,13 +118,13 @@ public:
     Image *Img;
     int Stt, Drt;
 
-    void Update_Rect() {
+    virtual void Update_Rect() {
         Rct.Left = xf + Offset;
         Rct.Right = Rct.Left + Img->w;
         Rct.Bottom = yf + Offset;
         Rct.Top = Rct.Bottom + Img->h;
     }
-    void Draw() {
+    virtual void Draw() {
         Map_Texture(Img);
         Draw_Rect(&Rct);
     }
@@ -329,28 +329,50 @@ float c_Enemy_Move_4::Img_Offset;
 int c_Enemy_Move_4::Drt_Find[4] = {UP, RIGHT, DOWN, LEFT};
 int c_Enemy_Move_4::Drt_Max = 4;
 
-template<class T>
-class c_Enemy_Factory: public c_Enemy {
+class c_Factory: public c_Enemy {
 public:
-    static Image Img_Save;
+	static Image Img_Save;
     static float Img_Offset;
     static void Init_Image();
+    
+	bool Is_Create;
+	
+    c_Factory(int x, int y, int Drt):c_Enemy(x,y){
+    	Img=&Img_Save;
+    	Offset=Img_Offset;
+    	this->Drt=Drt;
+	}
 };
 
-//Image c_Enemy_Factory::Img_Save;
-//float c_Enemy_Factory::Img_Offset;
+Image c_Factory::Img_Save;
+float c_Factory::Img_Offset;
 
-//void c_Enemy_Factory::Init_Image(){
-//	Image Img_Tmp;
-//    Load_Texture(&Img_Tmp, "Images/Wall.png");
-//    Create_Image(&Img_Save, Img_Tmp.w+PIXEL_SIZE, Img_Tmp.h+PIXEL_SIZE);
-//    Mix_Image_Color(&Img_Save, &Img_Tmp, PIXEL_SIZE, PIXEL_SIZE, Color_Shadow);
-//    Mix_Image(&Img_Save, &Img_Tmp, 0, 0);
-//    Delete_Image(&Img_Tmp);
-//    Img_Offset=(TILE_SIZE-Img_Save.w)/2;
-//}
+void c_Factory::Init_Image(){
+	Image Img_Tmp;
+    Load_Texture(&Img_Tmp, "Images/Factory.png");
+    Create_Image_Shadow(&Img_Tmp, &Img_Save);
+    Delete_Image(&Img_Tmp);
+    Img_Offset = (TILE_SIZE - Img_Save.w) / 2;
+}
 
 std::vector<c_Enemy *> Enemy;
+std::vector<c_Enemy *> Enemy_Create;
+
+class c_Factory_Move_1:public c_Factory{
+public:
+	c_Factory_Move_1(int x, int y, int Drt):c_Factory(x,y,Drt){
+	}
+	void Action(){
+		if (Check_Move(x+Drt_Offset[Drt].x,y+Drt_Offset[Drt].y)==CAN_MOVE){
+			c_Enemy_Move_1 *e=new c_Enemy_Move_1(x,y,Drt);
+			e->Is_Move=true;
+			Enemy_Create.push_back(e);
+		}
+	}
+	void Update(){
+		
+	}
+};
 
 // Prototype
 
@@ -365,5 +387,6 @@ std::vector<c_Enemy *> Enemy;
 #include "init.cpp"
 #include "cPlayer.cpp"
 #include "cEnemy.cpp"
+#include "cFactory.cpp"
 
 #endif
