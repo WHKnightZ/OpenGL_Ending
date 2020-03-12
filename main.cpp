@@ -16,7 +16,7 @@ void Display() {
     for (c_Particle *particle : Particle)
         particle->Draw();
     if (Player.Is_Alive)
-		Player.Draw();
+        Player.Draw();
     glutSwapBuffers();
 }
 
@@ -60,7 +60,7 @@ void Timer(int value) {
     while (i != Particle.end()) {
         (*i)->Update();
         if ((*i)->Check_Outside()) {
-        	// delete first
+            // delete first
             i = Particle.erase(i);
         } else
             i++;

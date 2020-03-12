@@ -1,9 +1,9 @@
 #include "main.h"
 
-void Swap(int &x, int &y){
-	int Tmp=x;
-	x=y;
-	y=Tmp;
+void Swap(int &x, int &y) {
+    int Tmp = x;
+    x = y;
+    y = Tmp;
 }
 
 int Abs(int x) {

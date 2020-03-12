@@ -3,7 +3,7 @@
 // Enemy Wall
 
 c_Enemy_Wall::c_Enemy_Wall(int x, int y): c_Enemy(x, y) {
-	Offset=Img_Offset;
+    Offset = Img_Offset;
     Img = &Img_Save;
     Update_Rect();
 }
@@ -19,8 +19,8 @@ void c_Enemy_Wall::Init_Image() {
 // Enemy Stand 1
 
 c_Enemy_Stand_1::c_Enemy_Stand_1(int x, int y, int Drt): c_Enemy(x, y) {
-	this->Drt = Drt;
-	Offset=Img_Offset;
+    this->Drt = Drt;
+    Offset = Img_Offset;
     Img = &Img_Save[Drt];
     Update_Rect();
 }
@@ -45,8 +45,8 @@ void c_Enemy_Stand_1::Init_Image() {
 // Enemy Stand 2
 
 c_Enemy_Stand_2::c_Enemy_Stand_2(int x, int y, int Drt): c_Enemy(x, y) {
-	this->Drt = Drt;
-	Offset=Img_Offset;
+    this->Drt = Drt;
+    Offset = Img_Offset;
     Img = &Img_Save[Drt];
     Update_Rect();
 }
@@ -65,9 +65,9 @@ void c_Enemy_Stand_2::Init_Image() {
 // Enemy Move 1
 
 c_Enemy_Move_1::c_Enemy_Move_1(int x, int y, int Drt): c_Enemy(x, y) {
-	this->Drt = Drt;
-	Is_Move = Is_Rotate = false;
-	Offset=Img_Offset;
+    this->Drt = Drt;
+    Is_Move = Is_Rotate = false;
+    Offset = Img_Offset;
     Img = &Img_Save[Drt];
     Update_Rect();
 }
@@ -111,7 +111,7 @@ bool c_Enemy_Move_1::BFS() {
 
 void c_Enemy_Move_1::Action() {
     Is_Move = Is_Rotate = false;
-    Swap(Drt_Find[0],Drt_Find[Drt]);
+    Swap(Drt_Find[0], Drt_Find[Drt]);
     if (BFS()) {
         if (Drt_Next != Drt) {
             Is_Rotate = true;
@@ -138,7 +138,7 @@ void c_Enemy_Move_1::Action() {
 //        if (Drt_Next != Drt)
 //            Is_Rotate = true;
 //    }
-    Swap(Drt_Find[0],Drt_Find[Drt]);
+    Swap(Drt_Find[0], Drt_Find[Drt]);
 }
 
 void c_Enemy_Move_1::Update() {
@@ -199,18 +199,18 @@ void c_Enemy_Move_1::Init_Image() {
 // Enemy Move 2
 
 c_Enemy_Move_2::c_Enemy_Move_2(int x, int y, int Drt): c_Enemy(x, y) {
-	this->Drt = Drt;
-	Is_Move = false;
-	Offset=Img_Offset;
+    this->Drt = Drt;
+    Is_Move = false;
+    Offset = Img_Offset;
     Img = &Img_Save[Drt];
     Update_Rect();
 }
 
 void c_Enemy_Move_2::Action() {
-	int Axis=Drt_Map_Axis[Drt];
-	int Drt2=Drt_Map[Drt];
-	Is_Move = true;
-    Swap(Drt_Find[Axis][0],Drt_Find[Axis][Drt2]);
+    int Axis = Drt_Map_Axis[Drt];
+    int Drt2 = Drt_Map[Drt];
+    Is_Move = true;
+    Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
     int Drt_Next = Drt_Find[Axis][0];
     int H = Heuristic(x + Drt_Offset[Drt_Next].x, y + Drt_Offset[Drt_Next].y), H2;
     for (int i = 1; i < Drt_Max; i++) {
@@ -220,11 +220,11 @@ void c_Enemy_Move_2::Action() {
             Drt_Next = Drt_Find[Axis][i];
         }
     }
-    Swap(Drt_Find[Axis][0],Drt_Find[Axis][Drt2]);
+    Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
 }
 
 void c_Enemy_Move_2::Update() {
-	if (Is_Move) {
+    if (Is_Move) {
         xf += Drt_Offset[Drt].x * Offset_Forward[Enemy_Stt];
         yf += Drt_Offset[Drt].y * Offset_Forward[Enemy_Stt];
         Update_Rect();
@@ -247,14 +247,14 @@ void c_Enemy_Move_2::Init_Image() {
 // Enemy Move 4
 
 c_Enemy_Move_4::c_Enemy_Move_4(int x, int y): c_Enemy(x, y) {
-	Is_Move = false;
-	Offset=Img_Offset;
+    Is_Move = false;
+    Offset = Img_Offset;
     Img = &Img_Save;
     Update_Rect();
 }
 
 bool c_Enemy_Move_4::BFS() {
-	for (int i = 0; i < Max_Y; i++)
+    for (int i = 0; i < Max_Y; i++)
         for (int j = 0; j < Max_X; j++)
             Mark[i][j] = false;
     Queue_Current = Queue_Last = 0;
@@ -291,7 +291,7 @@ bool c_Enemy_Move_4::BFS() {
 }
 
 void c_Enemy_Move_4::Action() {
-	Is_Move = false;
+    Is_Move = false;
     if (BFS()) {
         x += Drt_Offset[Drt].x;
         y += Drt_Offset[Drt].y;
@@ -304,7 +304,7 @@ void c_Enemy_Move_4::Action() {
 }
 
 void c_Enemy_Move_4::Update() {
-	if (Is_Move) {
+    if (Is_Move) {
         xf += Drt_Offset[Drt].x * Offset_Forward[Enemy_Stt];
         yf += Drt_Offset[Drt].y * Offset_Forward[Enemy_Stt];
         Update_Rect();

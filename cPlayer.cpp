@@ -1,7 +1,7 @@
 #include "main.h"
 
 void c_Player::Init(int x, int y) {
-	Offset=0.0f;
+    Offset = 0.0f;
     Is_Alive = true;
     this->x = x;
     this->y = y;
