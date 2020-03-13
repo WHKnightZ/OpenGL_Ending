@@ -140,8 +140,8 @@ void Load_Map() {
             Enemy.push_back(new c_Enemy_Move_2(x, y, Drt));
             break;
         case 5:
-            fscanf(f, "%d%d", &x, &y);
-            Enemy.push_back(new c_Enemy_Move_4(x, y));
+            fscanf(f, "%d%d%d", &x, &y,&Drt);
+            Enemy.push_back(new c_Enemy_Move_4(x, y,Drt));
             break;
         }
     }
@@ -149,8 +149,8 @@ void Load_Map() {
 }
 
 void Reload_Translate() {
-    x = CENTER_X - (Player.xfbg + TILE_HALF);
-    y = CENTER_Y - (Player.yfbg + TILE_HALF);
+    x_Translate = CENTER_X - (Player.xfbg + TILE_HALF);
+    y_Translate = CENTER_Y - (Player.yfbg + TILE_HALF);
 }
 
 int Heuristic(int x, int y) {
@@ -181,7 +181,7 @@ void Init_Game() {
     c_Factory::Init_Image();
 
     Load_Map();
-    Enemy.push_back(new c_Factory_Move_1(4, 1, 3));
+    Enemy.push_back(new c_Factory_Move_4(4, 1, 3));
 
     Reload_Translate();
 }

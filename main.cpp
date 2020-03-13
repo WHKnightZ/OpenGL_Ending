@@ -3,7 +3,7 @@
 void Display() {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
-    glTranslatef(x, y, 0.0f);
+    glTranslatef(x_Translate, y_Translate, 0.0f);
     for (int i = 0; i < Max_Y; i++) {
         for (int j = 0; j < Max_X; j++) {
             Map_Texture(Img_Path[Map_Path[i][j]]);

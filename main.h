@@ -32,8 +32,8 @@
 
 int POS_X, POS_Y;
 int Max_X, Max_Y;
-int Level = 4;
-float x, y;
+int Level = 3;
+float x_Translate, y_Translate;
 Image Img_Path_Save[2][4];
 Image *Img_Path[8];
 
@@ -139,10 +139,11 @@ public:
 
     float vx, vy;
 
-    c_Particle(float x, float y, int Drt, float Velocity) {
+    c_Particle(float x, float y, int Drt) {
         Offset = 0.0f;
         xf = x;
         yf = y;
+        float Velocity= rand()%14/2.0f + 5.0f;
         vx = Drt_Offset[Drt].x * Velocity;
         vy = Drt_Offset[Drt].y * Velocity;
         Img = &Img_Save;
@@ -171,26 +172,29 @@ void c_Particle::Create_Explode(int x, int y, int Drt) {
     float Offset_1, Offset_2;
     Offset_1 = Drt_Offset[Drt].x * 8.0f;
     Offset_2 = Drt_Offset[Drt].y * 8.0f;
-    for (int i = -1; i <= 1; i++) {
-        Particle.push_back(new c_Particle(xf + Offset_2 * i, yf + Offset_1 * i, Drt, 2.0f * i + 5.0f));
+    float i1;
+    for (int i = 0; i < 4; i++) {
+    	i1=i-1.5f;
+        Particle.push_back(new c_Particle(xf + Offset_2 * i1, yf + Offset_1 * i1, Drt));
     }
     Drt = Drt_Loop_Prev[Drt_Save];
     Offset_1 = Drt_Offset[Drt].x * 8.0f;
     Offset_2 = Drt_Offset[Drt].y * 8.0f;
-    for (int i = -1; i <= 1; i++) {
-        Particle.push_back(new c_Particle(xf + Offset_2 * i, yf + Offset_1 * i, Drt, 2.0f * i + 5.0f));
+    for (int i = 0; i < 4; i++) {
+    	i1=i-1.5f;
+        Particle.push_back(new c_Particle(xf + Offset_2 * i1, yf + Offset_1 * i1, Drt));
     }
     Drt = Drt_Loop_Next[Drt_Save];
     Offset_1 = Drt_Offset[Drt].x * 8.0f;
     Offset_2 = Drt_Offset[Drt].y * 8.0f;
-    for (int i = -1; i <= 1; i++) {
-        Particle.push_back(new c_Particle(xf - Offset_2 * i, yf - Offset_1 * i, Drt, 2.0f * i + 5.0f));
+    for (int i = 0; i < 4; i++) {
+    	i1=i-1.5f;
+        Particle.push_back(new c_Particle(xf - Offset_2 * i1, yf - Offset_1 * i1, Drt));
     }
 }
 
 bool c_Particle::Check_Outside() {
-//	return (Rct.Right<-x||Rct.Left>WIDTH-x||Rct.Top<-y||Rct.Bottom>y-HEIGHT);
-    return false;
+	return (Rct.Right<-x_Translate||Rct.Left>WIDTH-x_Translate||Rct.Top<-y_Translate||Rct.Bottom>HEIGHT-y_Translate);
 }
 
 class c_Player: public c_Unit {
@@ -318,7 +322,7 @@ public:
 
     bool Is_Move;
 
-    c_Enemy_Move_4(int x, int y);
+    c_Enemy_Move_4(int x, int y, int Drt);
     bool BFS();
     void Action();
     void Update();
@@ -361,12 +365,53 @@ std::vector<c_Enemy *> Enemy_Create;
 
 class c_Factory_Move_1: public c_Factory {
 public:
+	
     c_Factory_Move_1(int x, int y, int Drt): c_Factory(x, y, Drt) {
     }
     void Action() {
         int x_Next = x + Drt_Offset[Drt].x, y_Next = y + Drt_Offset[Drt].y;
         if (Check_Move(x_Next, y_Next) == CAN_MOVE) {
             c_Enemy_Move_1 *e = new c_Enemy_Move_1(x, y, Drt);
+            e->Is_Move = true;
+            e->x = x_Next;
+            e->y = y_Next;
+            Enemy_Create.push_back(e);
+        }
+    }
+    void Update() {
+
+    }
+};
+
+class c_Factory_Move_2: public c_Factory {
+public:
+	
+    c_Factory_Move_2(int x, int y, int Drt): c_Factory(x, y, Drt) {
+    }
+    void Action() {
+        int x_Next = x + Drt_Offset[Drt].x, y_Next = y + Drt_Offset[Drt].y;
+        if (Check_Move(x_Next, y_Next) == CAN_MOVE) {
+            c_Enemy_Move_2 *e = new c_Enemy_Move_2(x, y, Drt);
+            e->Is_Move = true;
+            e->x = x_Next;
+            e->y = y_Next;
+            Enemy_Create.push_back(e);
+        }
+    }
+    void Update() {
+
+    }
+};
+
+class c_Factory_Move_4: public c_Factory {
+public:
+	
+    c_Factory_Move_4(int x, int y, int Drt): c_Factory(x, y, Drt) {
+    }
+    void Action() {
+        int x_Next = x + Drt_Offset[Drt].x, y_Next = y + Drt_Offset[Drt].y;
+        if (Check_Move(x_Next, y_Next) == CAN_MOVE) {
+            c_Enemy_Move_4 *e = new c_Enemy_Move_4(x, y, Drt);
             e->Is_Move = true;
             e->x = x_Next;
             e->y = y_Next;
