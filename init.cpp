@@ -10,6 +10,86 @@ int Abs(int x) {
     return x > 0 ? x : -x;
 }
 
+// Menu
+
+void Reload_Page() {
+    Item_Begin = Page_Current * ITEM_PER_PAGE;
+    Item_End = (Page_Current == Page_Max ? Max_Level : (Item_Begin + ITEM_PER_PAGE - 1));
+}
+
+void Init_Menu() {
+    Level_Current = 0;
+    char Str[40];
+    FILE *f;
+    while(true) {
+        sprintf(Str, "Maps/%02d.txt", Level_Current);
+        f = fopen(Str, "r");
+        if (f == NULL)
+            break;
+        Level_Current++;
+        fclose(f);
+    }
+    Max_Level = Level_Current - 1;
+    Page_Max = Max_Level / ITEM_PER_PAGE;
+    Image Img_Num[10];
+    for(int i = 0; i < 10; i++) {
+        sprintf(Str, "Images/Menu/%d.png", i);
+        Load_Texture(&Img_Num[i], Str);
+    }
+    Create_Image_Color(&Img_Background, 1, 1, Color_Menu_Background);
+    Image Img_Frame_Off;
+    Load_Texture(&Img_Frame_Off, "Images/Menu/Frame_Off.png");
+    Load_Texture(&Img_Frame_On, "Images/Menu/Frame_On.png");
+    int a, b;
+    int Start_X = 2 * PIXEL_SIZE, Start_X_2 = 6 * PIXEL_SIZE, Start_Y = Start_X;
+    int Level_Width = 11 * PIXEL_SIZE, Level_Height = 5 * PIXEL_SIZE;
+    for (int i = 0; i <= Max_Level; i++) {
+        Create_Image(&Img_Level[i], Level_Width, Level_Height);
+        a = i / 10;
+        b = i % 10;
+        Mix_Image(&Img_Level[i], &Img_Num[a], 0, 0);
+        Mix_Image(&Img_Level[i], &Img_Num[b], Start_X_2, 0);
+        Clone_Image(&Img_Frame_Off, &Img_Select_Level[i]);
+        Mix_Image(&Img_Select_Level[i], &Img_Level[i], Start_X, Start_Y);
+    }
+    Rect *p;
+    float Item_Width = Img_Frame_Off.w, Item_Height = Img_Frame_Off.h;
+    float Item_Width_Extra = Item_Width + PIXEL_SIZE, Item_Height_Extra = Item_Height + PIXEL_SIZE;
+    float Full_Width = Item_Width_Extra * ITEM_PER_ROW - PIXEL_SIZE;
+    float Full_Height = Item_Height_Extra * ITEM_PER_COLUMN - PIXEL_SIZE;
+    float Begin_X = (WIDTH - Full_Width) / 2;
+    float Begin_Y = (HEIGHT - Full_Height) / 2 - 10.0f;
+    for (int i = 0; i < ITEM_PER_PAGE; i++) {
+        p = &Rct_Select_Level[i];
+        a = i % ITEM_PER_ROW;
+        b = i / ITEM_PER_ROW;
+        p->Left = Begin_X + a * Item_Width_Extra;
+        p->Right = p->Left + Item_Width;
+        p->Bottom = Begin_Y + b * Item_Height_Extra;
+        p->Top = p->Bottom + Item_Height;
+    }
+    Load_Texture(&Img_Control[0][0], "Images/Menu/Prev_Off.png");
+    Load_Texture(&Img_Control[0][1], "Images/Menu/Prev_On.png");
+    Load_Texture(&Img_Control[1][0], "Images/Menu/Next_Off.png");
+    Load_Texture(&Img_Control[1][1], "Images/Menu/Next_On.png");
+    Rct_Control[0].Bottom = Rct_Control[1].Bottom = Begin_Y + Full_Height + 3 * PIXEL_SIZE;
+    Rct_Control[0].Top = Rct_Control[1].Top = Rct_Control[0].Bottom + Img_Control[0][0].h;
+    Rct_Control[0].Left = CENTER_X - Full_Width / 4 - Img_Control[0][0].w / 2;
+    Rct_Control[0].Right = Rct_Control[0].Left + Img_Control[0][0].w;
+    Rct_Control[1].Left = CENTER_X + Full_Width / 4 - Img_Control[0][0].w / 2;
+    Rct_Control[1].Right = Rct_Control[1].Left + Img_Control[0][0].w;
+
+    for (int i = 0; i < 10; i++)
+        Delete_Image(&Img_Num[i]);
+    Reload_Page();
+    Rct_Level.Left = (WIDTH - Img_Level[0].w) / 2;
+    Rct_Level.Right = Rct_Level.Left + Img_Level[0].w;
+    Rct_Level.Bottom = (HEIGHT - Img_Level[0].h) / 2;
+    Rct_Level.Top = Rct_Level.Bottom + Img_Level[0].h;
+}
+
+// Game
+
 bool Check_Wall_Outside(int &x, int &y) {
     if (x == 0 || y == 0 || x == Max_X - 1 || y == Max_Y - 1)
         return true;
@@ -86,7 +166,7 @@ void Hit_Enemy(int x, int y, int Drt) {
 
 void Load_Map() {
     char Str[30];
-    sprintf(Str, "Maps/%02d.txt", Level);
+    sprintf(Str, "Maps/%02d.txt", Level_Current);
     FILE *f = fopen(Str, "r");
     int n;
     fscanf(f, "%d%d", &Max_X, &Max_Y);
@@ -140,8 +220,8 @@ void Load_Map() {
             Enemy.push_back(new c_Enemy_Move_2(x, y, Drt));
             break;
         case 5:
-            fscanf(f, "%d%d%d", &x, &y,&Drt);
-            Enemy.push_back(new c_Enemy_Move_4(x, y,Drt));
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Enemy_Move_4(x, y, Drt));
             break;
         }
     }
@@ -179,11 +259,11 @@ void Init_Game() {
     c_Enemy_Move_2::Init_Image();
     c_Enemy_Move_4::Init_Image();
     c_Factory::Init_Image();
-
-    Load_Map();
-    Enemy.push_back(new c_Factory_Move_4(4, 1, 3));
-
-    Reload_Translate();
+    Rct_Player.Left = CENTER_X - c_Player::Img_Save.w / 2;
+    Rct_Player.Right = Rct_Player.Left + c_Player::Img_Save.w;
+    Rct_Player.Bottom = CENTER_Y - c_Player::Img_Save.h / 2;
+    Rct_Player.Top = Rct_Player.Bottom + c_Player::Img_Save.h;
+//    Enemy.push_back(new c_Factory_Move_4(4, 1, 3));
 }
 
 void Init_GL() {
@@ -202,4 +282,7 @@ void Init_GL() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glutIgnoreKeyRepeat(GL_TRUE);
     glEnable(GL_TEXTURE_2D);
+
+    Init_Menu();
+    Game_State = GAME_MENU;
 }

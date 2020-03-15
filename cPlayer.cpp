@@ -50,11 +50,12 @@ void c_Player::Update() {
             if (Move_Stt != OBSTACLE_WALL) {
                 Turn = TURN_ENEMY;
                 Enemy_Stt = 0;
+                std::sort(Enemy.begin(), Enemy.end(), Enemy_Compare);
                 for(c_Enemy *enemy : Enemy) {
                     enemy->Action();
                 }
-                Enemy.insert(Enemy.end(), Enemy_Create.begin(), Enemy_Create.end());
-                Enemy_Create.clear();
+                Enemy.insert(Enemy.end(), Enemy_Spawn.begin(), Enemy_Spawn.end());
+                Enemy_Spawn.clear();
             }
             Is_Move = false;
         }

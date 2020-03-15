@@ -118,37 +118,38 @@ void c_Enemy_Move_1::Action() {
         } else {
             x += Drt_Offset[Drt].x;
             y += Drt_Offset[Drt].y;
+            Heu = Heuristic(x, y);
             if (x == Player.x && y == Player.y) {
                 c_Particle::Create_Explode(x, y, Drt);
                 Player.Is_Alive = false;
             }
             Is_Move = true;
         }
-    }
-	else {
-		bool Can_Move=false;
-		int H,Min=99;
-		int x_Next,y_Next;
+    } else {
+        bool Can_Move = false;
+        int H, Min = 99;
+        int x_Next, y_Next;
         for (int i = 0; i < Drt_Max; i++) {
-        	x_Next=x + Drt_Offset[Drt_Find[i]].x;
-        	y_Next=y + Drt_Offset[Drt_Find[i]].y;
+            x_Next = x + Drt_Offset[Drt_Find[i]].x;
+            y_Next = y + Drt_Offset[Drt_Find[i]].y;
             H = Heuristic(x_Next, y_Next);
-            if (Min>H&&Check_Move(x_Next,y_Next)==CAN_MOVE) {
-            	Can_Move=true;
-                Min=H;
+            if (Min > H && Check_Move(x_Next, y_Next) == CAN_MOVE) {
+                Can_Move = true;
+                Min = H;
                 Drt_Next = Drt_Find[i];
             }
         }
-        if (Can_Move){
-        	if (Drt_Next != Drt)
-            	Is_Rotate = true;
-            else{
-            	x += Drt_Offset[Drt].x;
-            	y += Drt_Offset[Drt].y;
-            	Is_Move=true;
-			}
-		}
-        
+        if (Can_Move) {
+            if (Drt_Next != Drt)
+                Is_Rotate = true;
+            else {
+                x += Drt_Offset[Drt].x;
+                y += Drt_Offset[Drt].y;
+                Heu = Heuristic(x, y);
+                Is_Move = true;
+            }
+        }
+
     }
     Swap(Drt_Find[0], Drt_Find[Drt]);
 }
@@ -240,6 +241,7 @@ void c_Enemy_Move_2::Action() {
     if (Is_Move) {
         x += Drt_Offset[Drt].x;
         y += Drt_Offset[Drt].y;
+        Heu = Heuristic(x, y);
     }
     Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
 }
@@ -268,7 +270,7 @@ void c_Enemy_Move_2::Init_Image() {
 // Enemy Move 4
 
 c_Enemy_Move_4::c_Enemy_Move_4(int x, int y, int Drt): c_Enemy(x, y) {
-	this->Drt=Drt;
+    this->Drt = Drt;
     Is_Move = false;
     Offset = Img_Offset;
     Img = &Img_Save;
@@ -317,31 +319,33 @@ void c_Enemy_Move_4::Action() {
     if (BFS()) {
         x += Drt_Offset[Drt].x;
         y += Drt_Offset[Drt].y;
+        Heu = Heuristic(x, y);
         if (x == Player.x && y == Player.y) {
             c_Particle::Create_Explode(x, y, Drt);
             Player.Is_Alive = false;
         }
         Is_Move = true;
-    }else{
-    	bool Can_Move=false;
-		int H,Min=99;
-		int x_Next,y_Next;
+    } else {
+        bool Can_Move = false;
+        int H, Min = 99;
+        int x_Next, y_Next;
         for (int i = 0; i < Drt_Max; i++) {
-        	x_Next=x + Drt_Offset[Drt_Find[i]].x;
-        	y_Next=y + Drt_Offset[Drt_Find[i]].y;
+            x_Next = x + Drt_Offset[Drt_Find[i]].x;
+            y_Next = y + Drt_Offset[Drt_Find[i]].y;
             H = Heuristic(x_Next, y_Next);
-            if (Min>H&&Check_Move(x_Next,y_Next)==CAN_MOVE) {
-            	Can_Move=true;
-                Min=H;
+            if (Min > H && Check_Move(x_Next, y_Next) == CAN_MOVE) {
+                Can_Move = true;
+                Min = H;
                 Drt = Drt_Find[i];
             }
         }
-        if (Can_Move){
-        	x += Drt_Offset[Drt].x;
-        	y += Drt_Offset[Drt].y;
-        	Is_Move=true;
-		}
-	}
+        if (Can_Move) {
+            x += Drt_Offset[Drt].x;
+            y += Drt_Offset[Drt].y;
+            Heu = Heuristic(x, y);
+            Is_Move = true;
+        }
+    }
 }
 
 void c_Enemy_Move_4::Update() {
