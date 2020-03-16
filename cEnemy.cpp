@@ -19,10 +19,32 @@ void c_Enemy_Wall::Init_Image() {
 // Enemy Stand 1
 
 c_Enemy_Stand_1::c_Enemy_Stand_1(int x, int y, int Drt): c_Enemy(x, y) {
+	Is_Move=false;
+	x1 = x+Drt_Offset[Drt].x;
+    y1 = y+Drt_Offset[Drt].y;
     this->Drt = Drt;
     Offset = Img_Offset;
     Img = &Img_Save[Drt];
     Update_Rect();
+}
+
+void c_Enemy_Stand_1::Action(){
+    if (x1 == Player.x && y1 == Player.y) {
+		Is_Move=true;
+		Game_Over(x1,y1,Drt);
+	}
+}
+
+void c_Enemy_Stand_1::Update(){
+	if (Is_Move) {
+        if (Enemy_Stt < 6) {
+            xf += Drt_Offset[Drt].x*Offset_Back[Enemy_Stt];
+            yf += Drt_Offset[Drt].y*Offset_Back[Enemy_Stt];
+        } else {
+            Is_Move = false;
+        }
+        Update_Rect();
+    }
 }
 
 void c_Enemy_Stand_1::Init_Image() {
@@ -45,10 +67,41 @@ void c_Enemy_Stand_1::Init_Image() {
 // Enemy Stand 2
 
 c_Enemy_Stand_2::c_Enemy_Stand_2(int x, int y, int Drt): c_Enemy(x, y) {
+	Is_Move=false;
+	x1 = x+Drt_Offset[Drt].x;
+    y1 = y+Drt_Offset[Drt].y;
+    x2 = x-Drt_Offset[Drt].x;
+    y2 = y-Drt_Offset[Drt].y;
     this->Drt = Drt;
     Offset = Img_Offset;
     Img = &Img_Save[Drt];
     Update_Rect();
+}
+
+void c_Enemy_Stand_2::Action(){
+	if (x1 == Player.x && y1 == Player.y) {
+		Drt_Next=Drt;
+        Game_Over(x1, y1, Drt_Next);
+		Is_Move=true;
+		return;
+	}
+	if (x2 == Player.x && y2 == Player.y) {
+		Drt_Next=Drt_Reverse[Drt];
+        Is_Move=true;
+        Game_Over(x2,y2,Drt_Next);
+	}
+}
+
+void c_Enemy_Stand_2::Update(){
+	if (Is_Move) {
+        if (Enemy_Stt < 6) {
+            xf += Drt_Offset[Drt_Next].x*Offset_Back[Enemy_Stt];
+            yf += Drt_Offset[Drt_Next].y*Offset_Back[Enemy_Stt];
+        } else {
+            Is_Move = false;
+        }
+        Update_Rect();
+    }
 }
 
 void c_Enemy_Stand_2::Init_Image() {
@@ -120,8 +173,7 @@ void c_Enemy_Move_1::Action() {
             y += Drt_Offset[Drt].y;
             Heu = Heuristic(x, y);
             if (x == Player.x && y == Player.y) {
-                c_Particle::Create_Explode(x, y, Drt);
-                Player.Is_Alive = false;
+                Game_Over(x,y,Drt);
             }
             Is_Move = true;
         }
@@ -241,6 +293,9 @@ void c_Enemy_Move_2::Action() {
     if (Is_Move) {
         x += Drt_Offset[Drt].x;
         y += Drt_Offset[Drt].y;
+        if (x==Player.x&&y==Player.y){
+        	Game_Over(x,y,Drt);
+		}
         Heu = Heuristic(x, y);
     }
     Swap(Drt_Find[Axis][0], Drt_Find[Axis][Drt2]);
@@ -321,8 +376,7 @@ void c_Enemy_Move_4::Action() {
         y += Drt_Offset[Drt].y;
         Heu = Heuristic(x, y);
         if (x == Player.x && y == Player.y) {
-            c_Particle::Create_Explode(x, y, Drt);
-            Player.Is_Alive = false;
+            Game_Over(x,y,Drt);
         }
         Is_Move = true;
     } else {

@@ -51,47 +51,52 @@ void Game_Display_Play() {
         Player.Draw();
 }
 
+void Game_Display_Over() {
+    glLoadIdentity();
+    glTranslatef(x_Translate, y_Translate, 0.0f);
+    for (int i = 0; i < Max_Y; i++) {
+        for (int j = 0; j < Max_X; j++) {
+            Map_Texture(Img_Path[Map_Path[i][j]]);
+            Draw_Rect(&Rct_Map[i][j]);
+        }
+    }
+    for(c_Enemy *enemy : Enemy) {
+        enemy->Draw();
+    }
+    for (c_Particle *particle : Particle)
+        particle->Draw();
+    if (Player.Is_Alive)
+        Player.Draw();
+}
+
 void Game_Display_Reset() {
     Map_Texture(&c_Player::Img_Save);
     Draw_Rect(&Rct_Player);
 }
 
 void Game_Display_Win() {
-
+	Game_Display_Play();
 }
 
 // Process
 
 void Game_Process_Switch() {
-    if (Switch_Src == GAME_PLAY) {
-        Game_Process_Play();
-        printf("x");
-        if (Switch_Alpha <= 1.0f) {
-            Switch_Alpha += 0.03f;
-        } else
-            Game_State = Switch_Dst;
-        printf("y");
-    } else {
-        if (Switch_Alpha <= 1.0f) {
-            Switch_Alpha += 0.03f;
-            glutPostRedisplay();
-        } else
-            Game_State = Switch_Dst;
-    }
+    if (Switch_Alpha <= 1.0f) {
+        Switch_Alpha += 0.03f;
+    } else{
+    	Game_State = Switch_Dst;
+    	Game_Action_Func[Game_State]();
+	}
+    Game_Process_Func[Switch_Src]();
 }
 
 void Game_Process_Menu() {
-
+	glutPostRedisplay();
 }
 
 void Game_Process_Level() {
-    // delete enemy first
-    Load_Map();
-    Reload_Translate();
-    Switch_Alpha = 0.0f;
-    Switch_Src = Game_State;
-    Switch_Dst = GAME_PLAY;
-    Game_State = GAME_SWITCH;
+    
+    glutPostRedisplay();
 }
 
 void Game_Process_Play() {
@@ -114,7 +119,30 @@ void Game_Process_Play() {
         } else
             i++;
     }
-    if (!Player.Is_Alive && Game_State != GAME_SWITCH) {
+    glutPostRedisplay();
+}
+
+void Game_Process_Over() {
+    if (Turn == TURN_PLAYER)
+        Player.Update();
+    else {
+        for(c_Enemy *enemy : Enemy) {
+            enemy->Update();
+        }
+        Enemy_Stt++;
+        if (Enemy_Stt == 6)
+            Turn = TURN_PLAYER;
+    }
+    std::vector<c_Particle *>::iterator i = Particle.begin();
+    while (i != Particle.end()) {
+        (*i)->Update();
+        if ((*i)->Check_Outside()) {
+            // delete first
+            i = Particle.erase(i);
+        } else
+            i++;
+    }
+    if (Game_State != GAME_SWITCH) {
         if (Game_Timer < 20) {
             Game_Timer++;
         } else {
@@ -129,7 +157,57 @@ void Game_Process_Play() {
 }
 
 void Game_Process_Reset() {
-    // delete enemy
+    glutPostRedisplay();
+}
+
+void Game_Process_Win() {
+	if (Game_State==GAME_WIN){
+		if (Game_Timer<20){
+			Game_Timer++;
+		}else{
+			Level_Current++;
+			Game_Timer=0;
+			Switch_Alpha = 0.0f;
+	        Switch_Src = Game_State;
+	        Switch_Dst = GAME_LEVEL;
+	        Game_State = GAME_SWITCH;
+		}
+	}
+	glutPostRedisplay();
+}
+
+// Action
+
+void Game_Action_Switch(){	
+}
+
+void Game_Action_Menu(){
+	
+}
+
+void Game_Action_Level(){
+	for (auto i:Enemy)
+		delete i;
+	Enemy.clear();
+    Load_Map();
+    Reload_Translate();
+    Switch_Alpha = 0.0f;
+    Switch_Src = Game_State;
+    Switch_Dst = GAME_PLAY;
+    Game_State = GAME_SWITCH;
+}
+
+void Game_Action_Play(){
+	
+}
+
+void Game_Action_Over(){
+	
+}
+
+void Game_Action_Reset(){
+	for (auto i:Enemy)
+		delete i;
     Enemy.clear();
     Particle.clear();
     Load_Map();
@@ -140,8 +218,8 @@ void Game_Process_Reset() {
     Game_State = GAME_SWITCH;
 }
 
-void Game_Process_Win() {
-
+void Game_Action_Win(){
+	
 }
 
 // Keyboard

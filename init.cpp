@@ -90,6 +90,13 @@ void Init_Menu() {
 
 // Game
 
+void Game_Over(int &x, int &y, int &Drt){
+	c_Particle::Create_Explode(x, y, Drt);
+	Player.Is_Alive=false;
+	Game_Timer = 0;
+    Game_State = GAME_OVER;
+}
+
 bool Check_Wall_Outside(int &x, int &y) {
     if (x == 0 || y == 0 || x == Max_X - 1 || y == Max_Y - 1)
         return true;
@@ -223,14 +230,26 @@ void Load_Map() {
             fscanf(f, "%d%d%d", &x, &y, &Drt);
             Enemy.push_back(new c_Enemy_Move_4(x, y, Drt));
             break;
+        case 6:
+        	fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Factory_Move_1(x, y, Drt));
+            break;
+        case 7:
+        	fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Factory_Move_2(x, y, Drt));
+            break;
+        case 8:
+        	fscanf(f, "%d%d%d", &x, &y, &Drt);
+            Enemy.push_back(new c_Factory_Move_4(x, y, Drt));
+            break;
         }
     }
     fclose(f);
 }
 
 void Reload_Translate() {
-    x_Translate = CENTER_X - (Player.xfbg + TILE_HALF);
-    y_Translate = CENTER_Y - (Player.yfbg + TILE_HALF);
+    x_Translate = CENTER_X - (int)(Player.xfbg + TILE_HALF);
+    y_Translate = CENTER_Y - (int)(Player.yfbg + TILE_HALF);
 }
 
 int Heuristic(int x, int y) {
@@ -263,7 +282,6 @@ void Init_Game() {
     Rct_Player.Right = Rct_Player.Left + c_Player::Img_Save.w;
     Rct_Player.Bottom = CENTER_Y - c_Player::Img_Save.h / 2;
     Rct_Player.Top = Rct_Player.Bottom + c_Player::Img_Save.h;
-//    Enemy.push_back(new c_Factory_Move_4(4, 1, 3));
 }
 
 void Init_GL() {

@@ -35,6 +35,10 @@
 
 #define INTERVAL 25
 
+// Enemy stand 2 dap. player nhu the nao??, ro rang la 2 unit
+// sao enemy_move_2 lai chay ra ngoai duoc, tai sao 2 enemy cung dap dc player??
+// player chet roi co can hit ko?
+
 int POS_X, POS_Y;
 int Max_X, Max_Y;
 int Level_Current = 4, Max_Level;
@@ -55,6 +59,7 @@ enum GAME_STATE {
     GAME_MENU,
     GAME_LEVEL,
     GAME_PLAY,
+    GAME_OVER,
     GAME_RESET,
     GAME_WIN
 };
@@ -127,7 +132,6 @@ float Offset_Forward[] = {24.0f, 16.0f, 8.0f, 0.0f, 0.0f, 0.0f};
 float Offset_Back[] = {24.0f, -16.0f, -8.0f, 0.0f, 0.0f, 0.0f};
 
 int Game_Timer = 0;
-// xoa di chuyen duoc khi deadth bang trang thai ms GAME_OVER
 
 bool Mark[MAX_Y][MAX_X];
 s_Point Queue[MAX_Y * MAX_X];
@@ -153,6 +157,8 @@ public:
     Rect Rct;
     Image *Img;
     int Stt, Drt;
+    bool Is_Move, Is_Alive;
+    int Move_Stt;
 
     virtual void Update_Rect() {
         Rct.Left = xf + Offset;
@@ -187,10 +193,8 @@ class c_Player: public c_Unit {
 public:
     static Image Img_Save;
     static void Init_Image();
-
+    
     float xfbg, yfbg, *o, obg;
-    bool Is_Move, Is_Alive;
-    int Move_Stt;
 
     void Init(int x, int y);
     void Move(int Drt);
@@ -239,7 +243,11 @@ public:
     static float Img_Offset;
     static void Init_Image();
 
+	int x1,y1;
+	
     c_Enemy_Stand_1(int x, int y, int Drt);
+    void Action();
+    void Update();
 };
 
 Image c_Enemy_Stand_1::Img_Save[4];
@@ -250,8 +258,13 @@ public:
     static Image Img_Save[2];
     static float Img_Offset;
     static void Init_Image();
+    
+    int x1,y1,x2,y2;
+    int Drt_Next;
 
     c_Enemy_Stand_2(int x, int y, int Drt);
+    void Action();
+    void Update();
 };
 
 Image c_Enemy_Stand_2::Img_Save[2];
@@ -266,8 +279,8 @@ public:
     static int Drt_Max;
     static void Init_Image();
 
-    int Drt, Drt_Next;
-    bool Is_Move, Is_Rotate;
+    int Drt_Next;
+    bool Is_Rotate;
 
     c_Enemy_Move_1(int x, int y, int Drt);
     bool BFS();
@@ -291,8 +304,6 @@ public:
     static int Drt_Map_Axis[4];
     static void Init_Image();
 
-    bool Is_Move;
-
     c_Enemy_Move_2(int x, int y, int Drt);
     void Action();
     void Update();
@@ -312,8 +323,6 @@ public:
     static int Drt_Find[4];
     static int Drt_Max;
     static void Init_Image();
-
-    bool Is_Move;
 
     c_Enemy_Move_4(int x, int y, int Drt);
     bool BFS();
@@ -369,14 +378,23 @@ void Game_Display_Switch();
 void Game_Display_Menu();
 void Game_Display_Level();
 void Game_Display_Play();
+void Game_Display_Over();
 void Game_Display_Reset();
 void Game_Display_Win();
 void Game_Process_Switch();
 void Game_Process_Menu();
 void Game_Process_Level();
 void Game_Process_Play();
+void Game_Process_Over();
 void Game_Process_Reset();
 void Game_Process_Win();
+void Game_Action_Switch();
+void Game_Action_Menu();
+void Game_Action_Level();
+void Game_Action_Play();
+void Game_Action_Over();
+void Game_Action_Reset();
+void Game_Action_Win();
 void Game_Keyboard_None(GLubyte &key);
 void Game_Keyboard_Menu(GLubyte &key);
 void Game_Keyboard_Play(GLubyte &key);
@@ -387,10 +405,11 @@ void Game_Special_Play(int &key);
 
 // Variable
 
-void (*Game_Display_Func[])() = {Game_Display_Switch, Game_Display_Menu, Game_Display_Level, Game_Display_Play, Game_Display_Reset, Game_Display_Win};
-void (*Game_Process_Func[])() = {Game_Process_Switch, Game_Process_Menu, Game_Process_Level, Game_Process_Play, Game_Process_Reset, Game_Process_Win};
-void (*Game_Keyboard_Func[])(GLubyte &key) = {Game_Keyboard_None, Game_Keyboard_Menu, Game_Keyboard_None, Game_Keyboard_Play, Game_Keyboard_None, Game_Keyboard_None};
-void (*Game_Special_Func[])(int &key) = {Game_Special_None, Game_Special_Menu, Game_Special_None, Game_Special_Play, Game_Special_None, Game_Special_None};
+void (*Game_Display_Func[])() = {Game_Display_Switch, Game_Display_Menu, Game_Display_Level, Game_Display_Play, Game_Display_Over, Game_Display_Reset, Game_Display_Win};
+void (*Game_Process_Func[])() = {Game_Process_Switch, Game_Process_Menu, Game_Process_Level, Game_Process_Play, Game_Process_Over, Game_Process_Reset, Game_Process_Win};
+void (*Game_Action_Func[])()={Game_Action_Switch,Game_Action_Menu,Game_Action_Level,Game_Action_Play,Game_Action_Over,Game_Action_Reset,Game_Action_Win};
+void (*Game_Keyboard_Func[])(GLubyte &key) = {Game_Keyboard_None, Game_Keyboard_Menu, Game_Keyboard_None, Game_Keyboard_Play, Game_Keyboard_None,Game_Keyboard_None, Game_Keyboard_None};
+void (*Game_Special_Func[])(int &key) = {Game_Special_None, Game_Special_Menu, Game_Special_None, Game_Special_Play, Game_Special_None,Game_Special_None, Game_Special_None};
 
 // including all referenced .c files, you don't need to compile all of them
 #include "afunc.cpp"

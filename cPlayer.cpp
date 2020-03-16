@@ -46,6 +46,9 @@ void c_Player::Update() {
             if (Move_Stt == CAN_MOVE) {
                 x += Drt_Offset[Drt].x;
                 y += Drt_Offset[Drt].y;
+                if (Map[y][x]==EXIT){
+                	Game_State=GAME_WIN;
+				}
             }
             if (Move_Stt != OBSTACLE_WALL) {
                 Turn = TURN_ENEMY;
