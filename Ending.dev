@@ -11,7 +11,7 @@ ResourceIncludes=
 MakeIncludes=
 Compiler=
 CppCompiler=
-Linker=-lopengl32_@@_-lglu32_@@_-lglut32_@@_
+Linker=-lopengl32_@@_-lglu32_@@_-lglut32_@@_-lSDL2_@@_-lSDL2_mixer_@@_
 IsCpp=1
 Icon=
 ExeOutput=
@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
 CompilerSettings=00000001c0000000000000000
-UnitCount=8
+UnitCount=9
 
 [VersionInfo]
 Major=1
@@ -129,4 +129,14 @@ Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=$(CPP) -c cFactory.cpp -o cFactory.o $(CXXFLAGS)
+
+[Unit9]
+FileName=sound.cpp
+CompileCpp=1
+Folder=
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=$(CPP) -c sound.cpp -o sound.o $(CXXFLAGS)
 

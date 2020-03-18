@@ -4,18 +4,13 @@
 #include "../Library/loadpng.h"
 #include "../Library/process_image.h"
 
+#include <SDL2/SDL_mixer.h>
 #include <GL/glut.h>
 
 #include <vector>
 #include <algorithm>
 
 #include "../Library/gl_texture.h"
-
-/*
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-*/
 
 #define WIDTH 600
 #define HEIGHT 600
@@ -35,13 +30,9 @@
 
 #define INTERVAL 25
 
-// Enemy stand 2 dap. player nhu the nao??, ro rang la 2 unit
-// sao enemy_move_2 lai chay ra ngoai duoc, tai sao 2 enemy cung dap dc player??
-// player chet roi co can hit ko?
-
 int POS_X, POS_Y;
 int Max_X, Max_Y;
-int Level_Current = 4, Max_Level;
+int Level_Current, Max_Level;
 float x_Translate, y_Translate;
 Image Img_Path_Save[2][4];
 Image *Img_Path[8];
@@ -60,8 +51,7 @@ enum GAME_STATE {
     GAME_LEVEL,
     GAME_PLAY,
     GAME_OVER,
-    GAME_RESET,
-    GAME_WIN
+    GAME_RESET
 };
 
 enum PATH {
@@ -152,6 +142,7 @@ void Reload_Page();
 
 class c_Unit {
 public:
+    virtual ~c_Unit() {}
     int x, y;
     float xf, yf, Offset;
     Rect Rct;
@@ -193,10 +184,12 @@ class c_Player: public c_Unit {
 public:
     static Image Img_Save;
     static void Init_Image();
-    
+    static int Check_Move(int x, int y);
+
     float xfbg, yfbg, *o, obg;
 
     void Init(int x, int y);
+    void Game_Over(int &x, int &y, int &Drt);
     void Move(int Drt);
     void Update();
 };
@@ -207,6 +200,8 @@ c_Player Player;
 
 class c_Enemy: public c_Unit {
 public:
+    static bool Check_Move(int x, int y);
+
     int Heu;
 
     c_Enemy(int x, int y) {
@@ -217,7 +212,9 @@ public:
         this->Stt = 0;
         Heu = Heuristic(x, y);
     }
-    virtual void Action() {}
+    virtual bool Action() {
+        return false;
+    }
     virtual void Update() {}
 };
 
@@ -243,10 +240,10 @@ public:
     static float Img_Offset;
     static void Init_Image();
 
-	int x1,y1;
-	
+    int x1, y1;
+
     c_Enemy_Stand_1(int x, int y, int Drt);
-    void Action();
+    bool Action();
     void Update();
 };
 
@@ -258,12 +255,12 @@ public:
     static Image Img_Save[2];
     static float Img_Offset;
     static void Init_Image();
-    
-    int x1,y1,x2,y2;
+
+    int x1, y1, x2, y2;
     int Drt_Next;
 
     c_Enemy_Stand_2(int x, int y, int Drt);
-    void Action();
+    bool Action();
     void Update();
 };
 
@@ -284,7 +281,7 @@ public:
 
     c_Enemy_Move_1(int x, int y, int Drt);
     bool BFS();
-    void Action();
+    bool Action();
     void Update();
 };
 
@@ -305,7 +302,7 @@ public:
     static void Init_Image();
 
     c_Enemy_Move_2(int x, int y, int Drt);
-    void Action();
+    bool Action();
     void Update();
 };
 
@@ -326,7 +323,7 @@ public:
 
     c_Enemy_Move_4(int x, int y, int Drt);
     bool BFS();
-    void Action();
+    bool Action();
     void Update();
 };
 
@@ -340,6 +337,7 @@ public:
     static Image Img_Save;
     static float Img_Offset;
     static void Init_Image();
+    static bool Check_Move(int x, int y);
 
     bool Is_Create;
 
@@ -355,24 +353,36 @@ std::vector<c_Enemy *> Enemy_Spawn;
 class c_Factory_Move_1: public c_Factory {
 public:
     c_Factory_Move_1(int x, int y, int Drt);
-    void Action();
+    bool Action();
 };
 
 class c_Factory_Move_2: public c_Factory {
 public:
     c_Factory_Move_2(int x, int y, int Drt);
-    void Action();
+    bool Action();
 };
 
 class c_Factory_Move_4: public c_Factory {
 public:
     c_Factory_Move_4(int x, int y, int Drt);
-    void Action();
+    bool Action();
 };
 
 // Prototype
-
 // main.h
+void Swap(int &x, int &y);
+int Abs(int x);
+void Reload_Page();
+void Init_Menu();
+bool Check_Wall_Outside(int &x, int &y);
+void Init_Image_Path();
+void Create_Image_Shadow(Image *in, Image *out);
+void Hit_Enemy(int x, int y, int Drt);
+void Load_Map();
+void Reload_Translate();
+int Heuristic(int x, int y);
+void Init_Game();
+void Init_GL();
 // afunc.h
 void Game_Display_Switch();
 void Game_Display_Menu();
@@ -380,40 +390,51 @@ void Game_Display_Level();
 void Game_Display_Play();
 void Game_Display_Over();
 void Game_Display_Reset();
-void Game_Display_Win();
 void Game_Process_Switch();
 void Game_Process_Menu();
 void Game_Process_Level();
 void Game_Process_Play();
 void Game_Process_Over();
 void Game_Process_Reset();
-void Game_Process_Win();
 void Game_Action_Switch();
 void Game_Action_Menu();
 void Game_Action_Level();
 void Game_Action_Play();
 void Game_Action_Over();
 void Game_Action_Reset();
-void Game_Action_Win();
 void Game_Keyboard_None(GLubyte &key);
 void Game_Keyboard_Menu(GLubyte &key);
 void Game_Keyboard_Play(GLubyte &key);
 void Game_Special_None(int &key);
 void Game_Special_Menu(int &key);
 void Game_Special_Play(int &key);
+// init.h
+void Display();
+void Resize(int x, int y);
+void Keyboard(GLubyte key, int x, int y);
+void Special(int key, int x, int y);
+void Timer(int value);
+// sound.h
+void Init_Sound();
+void Play_Sound(Mix_Chunk *Sound);
 // Function_Pointer
-
+void (*Game_Display_Func[])() = {Game_Display_Switch, Game_Display_Menu, Game_Display_Level, Game_Display_Play, Game_Display_Over, Game_Display_Reset};
+void (*Game_Process_Func[])() = {Game_Process_Switch, Game_Process_Menu, Game_Process_Level, Game_Process_Play, Game_Process_Over, Game_Process_Reset};
+void (*Game_Action_Func[])() = {Game_Action_Switch, Game_Action_Menu, Game_Action_Level, Game_Action_Play, Game_Action_Over, Game_Action_Reset};
+void (*Game_Keyboard_Func[])(GLubyte &key) = {Game_Keyboard_None, Game_Keyboard_Menu, Game_Keyboard_None, Game_Keyboard_Play, Game_Keyboard_None, Game_Keyboard_None};
+void (*Game_Special_Func[])(int &key) = {Game_Special_None, Game_Special_Menu, Game_Special_None, Game_Special_Play, Game_Special_None, Game_Special_None};
 // Variable
-
-void (*Game_Display_Func[])() = {Game_Display_Switch, Game_Display_Menu, Game_Display_Level, Game_Display_Play, Game_Display_Over, Game_Display_Reset, Game_Display_Win};
-void (*Game_Process_Func[])() = {Game_Process_Switch, Game_Process_Menu, Game_Process_Level, Game_Process_Play, Game_Process_Over, Game_Process_Reset, Game_Process_Win};
-void (*Game_Action_Func[])()={Game_Action_Switch,Game_Action_Menu,Game_Action_Level,Game_Action_Play,Game_Action_Over,Game_Action_Reset,Game_Action_Win};
-void (*Game_Keyboard_Func[])(GLubyte &key) = {Game_Keyboard_None, Game_Keyboard_Menu, Game_Keyboard_None, Game_Keyboard_Play, Game_Keyboard_None,Game_Keyboard_None, Game_Keyboard_None};
-void (*Game_Special_Func[])(int &key) = {Game_Special_None, Game_Special_Menu, Game_Special_None, Game_Special_Play, Game_Special_None,Game_Special_None, Game_Special_None};
+Mix_Chunk *Sound_Button = NULL;
+Mix_Chunk *Sound_Move = NULL;
+Mix_Chunk *Sound_Hit_Enemy = NULL;
+Mix_Chunk *Sound_Hit_Wall = NULL;
+Mix_Chunk *Sound_Lose = NULL;
+Mix_Chunk *Sound_Win = NULL;
 
 // including all referenced .c files, you don't need to compile all of them
 #include "afunc.cpp"
 #include "init.cpp"
+#include "sound.cpp"
 #include "cParticle.cpp"
 #include "cPlayer.cpp"
 #include "cEnemy.cpp"

@@ -33,16 +33,17 @@ void Init_Menu() {
     Page_Max = Max_Level / ITEM_PER_PAGE;
     Image Img_Num[10];
     for(int i = 0; i < 10; i++) {
-        sprintf(Str, "Images/Menu/%d.png", i);
+        sprintf(Str, "Images/UI/%d.png", i);
         Load_Texture(&Img_Num[i], Str);
     }
     Create_Image_Color(&Img_Background, 1, 1, Color_Menu_Background);
     Image Img_Frame_Off;
-    Load_Texture(&Img_Frame_Off, "Images/Menu/Frame_Off.png");
-    Load_Texture(&Img_Frame_On, "Images/Menu/Frame_On.png");
+    Load_Texture(&Img_Frame_Off, "Images/UI/Frame_Off.png");
+    Load_Texture(&Img_Frame_On, "Images/UI/Frame_On.png");
     int a, b;
     int Start_X = 2 * PIXEL_SIZE, Start_X_2 = 6 * PIXEL_SIZE, Start_Y = Start_X;
     int Level_Width = 11 * PIXEL_SIZE, Level_Height = 5 * PIXEL_SIZE;
+    unsigned char Color[] = {214, 232, 255, 255};
     for (int i = 0; i <= Max_Level; i++) {
         Create_Image(&Img_Level[i], Level_Width, Level_Height);
         a = i / 10;
@@ -50,7 +51,7 @@ void Init_Menu() {
         Mix_Image(&Img_Level[i], &Img_Num[a], 0, 0);
         Mix_Image(&Img_Level[i], &Img_Num[b], Start_X_2, 0);
         Clone_Image(&Img_Frame_Off, &Img_Select_Level[i]);
-        Mix_Image(&Img_Select_Level[i], &Img_Level[i], Start_X, Start_Y);
+        Mix_Image_Color(&Img_Select_Level[i], &Img_Level[i], Start_X, Start_Y, Color);
     }
     Rect *p;
     float Item_Width = Img_Frame_Off.w, Item_Height = Img_Frame_Off.h;
@@ -68,10 +69,10 @@ void Init_Menu() {
         p->Bottom = Begin_Y + b * Item_Height_Extra;
         p->Top = p->Bottom + Item_Height;
     }
-    Load_Texture(&Img_Control[0][0], "Images/Menu/Prev_Off.png");
-    Load_Texture(&Img_Control[0][1], "Images/Menu/Prev_On.png");
-    Load_Texture(&Img_Control[1][0], "Images/Menu/Next_Off.png");
-    Load_Texture(&Img_Control[1][1], "Images/Menu/Next_On.png");
+    Load_Texture(&Img_Control[0][0], "Images/UI/Prev_Off.png");
+    Load_Texture(&Img_Control[0][1], "Images/UI/Prev_On.png");
+    Load_Texture(&Img_Control[1][0], "Images/UI/Next_Off.png");
+    Load_Texture(&Img_Control[1][1], "Images/UI/Next_On.png");
     Rct_Control[0].Bottom = Rct_Control[1].Bottom = Begin_Y + Full_Height + 3 * PIXEL_SIZE;
     Rct_Control[0].Top = Rct_Control[1].Top = Rct_Control[0].Bottom + Img_Control[0][0].h;
     Rct_Control[0].Left = CENTER_X - Full_Width / 4 - Img_Control[0][0].w / 2;
@@ -90,13 +91,6 @@ void Init_Menu() {
 
 // Game
 
-void Game_Over(int &x, int &y, int &Drt){
-	c_Particle::Create_Explode(x, y, Drt);
-	Player.Is_Alive=false;
-	Game_Timer = 0;
-    Game_State = GAME_OVER;
-}
-
 bool Check_Wall_Outside(int &x, int &y) {
     if (x == 0 || y == 0 || x == Max_X - 1 || y == Max_Y - 1)
         return true;
@@ -112,9 +106,9 @@ void Init_Image_Path() {
     unsigned char Color_Wall[] = {155, 155, 155, 255};
     unsigned char Color_Shadow[] = {0, 0, 0, 255};
     Image Img_Wall, Img_Pixel, Img_Exit, Img_Shadow;
-    Load_Texture(&Img_Wall, "Images/Wall.png");
-    Load_Texture(&Img_Pixel, "Images/Pixel.png");
-    Load_Texture(&Img_Exit, "Images/Exit.png");
+    Load_Texture(&Img_Wall, "Images/Game/Wall.png");
+    Load_Texture(&Img_Pixel, "Images/Game/Pixel.png");
+    Load_Texture(&Img_Exit, "Images/Game/Exit.png");
     for (int i = 0; i < 4; i++) {
         Create_Image_Color(&Img_Path_Save[0][i], TILE_SIZE, TILE_SIZE, Color_BG[0]);
         Create_Image_Color(&Img_Path_Save[1][i], TILE_SIZE, TILE_SIZE, Color_BG[1]);
@@ -146,24 +140,12 @@ void Create_Image_Shadow(Image *in, Image *out) {
     Mix_Image(out, in, 0, 0);
 }
 
-int Check_Move(int x, int y) {
-    if (Map[y][x] == WALL)
-        return OBSTACLE_WALL;
-    std::vector<c_Enemy *>::iterator i = Enemy.begin();
-    while (i != Enemy.end()) {
-        if ((*i)->x == x && (*i)->y == y)
-            return OBSTACLE_ENEMY;
-        i++;
-    }
-    return CAN_MOVE;
-}
-
 void Hit_Enemy(int x, int y, int Drt) {
     std::vector<c_Enemy *>::iterator i = Enemy.begin();
     while (i != Enemy.end()) {
         if ((*i)->x == x && (*i)->y == y) {
             c_Particle::Create_Explode(x, y, Drt);
-            // delete first
+            delete *i;
             i = Enemy.erase(i);
             return;
         } else
@@ -231,15 +213,15 @@ void Load_Map() {
             Enemy.push_back(new c_Enemy_Move_4(x, y, Drt));
             break;
         case 6:
-        	fscanf(f, "%d%d%d", &x, &y, &Drt);
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
             Enemy.push_back(new c_Factory_Move_1(x, y, Drt));
             break;
         case 7:
-        	fscanf(f, "%d%d%d", &x, &y, &Drt);
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
             Enemy.push_back(new c_Factory_Move_2(x, y, Drt));
             break;
         case 8:
-        	fscanf(f, "%d%d%d", &x, &y, &Drt);
+            fscanf(f, "%d%d%d", &x, &y, &Drt);
             Enemy.push_back(new c_Factory_Move_4(x, y, Drt));
             break;
         }
@@ -301,6 +283,7 @@ void Init_GL() {
     glutIgnoreKeyRepeat(GL_TRUE);
     glEnable(GL_TEXTURE_2D);
 
+    Init_Sound();
     Init_Menu();
     Game_State = GAME_MENU;
 }

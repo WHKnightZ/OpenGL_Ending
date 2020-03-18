@@ -18,7 +18,7 @@ void c_Particle::Update() {
 
 void c_Particle::Init_Image() {
     Image Img_Tmp;
-    Load_Texture(&Img_Tmp, "Images/Pixel.png");
+    Load_Texture(&Img_Tmp, "Images/Game/Pixel.png");
     Create_Image_Shadow(&Img_Tmp, &Img_Save);
     Delete_Image(&Img_Tmp);
 }

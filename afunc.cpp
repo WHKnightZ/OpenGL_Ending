@@ -38,8 +38,10 @@ void Game_Display_Play() {
     glTranslatef(x_Translate, y_Translate, 0.0f);
     for (int i = 0; i < Max_Y; i++) {
         for (int j = 0; j < Max_X; j++) {
-            Map_Texture(Img_Path[Map_Path[i][j]]);
-            Draw_Rect(&Rct_Map[i][j]);
+            if (Map_Path[i][j] != -1) {
+                Map_Texture(Img_Path[Map_Path[i][j]]);
+                Draw_Rect(&Rct_Map[i][j]);
+            }
         }
     }
     for(c_Enemy *enemy : Enemy) {
@@ -52,21 +54,7 @@ void Game_Display_Play() {
 }
 
 void Game_Display_Over() {
-    glLoadIdentity();
-    glTranslatef(x_Translate, y_Translate, 0.0f);
-    for (int i = 0; i < Max_Y; i++) {
-        for (int j = 0; j < Max_X; j++) {
-            Map_Texture(Img_Path[Map_Path[i][j]]);
-            Draw_Rect(&Rct_Map[i][j]);
-        }
-    }
-    for(c_Enemy *enemy : Enemy) {
-        enemy->Draw();
-    }
-    for (c_Particle *particle : Particle)
-        particle->Draw();
-    if (Player.Is_Alive)
-        Player.Draw();
+    Game_Display_Play();
 }
 
 void Game_Display_Reset() {
@@ -74,28 +62,24 @@ void Game_Display_Reset() {
     Draw_Rect(&Rct_Player);
 }
 
-void Game_Display_Win() {
-	Game_Display_Play();
-}
-
 // Process
 
 void Game_Process_Switch() {
     if (Switch_Alpha <= 1.0f) {
-        Switch_Alpha += 0.03f;
-    } else{
-    	Game_State = Switch_Dst;
-    	Game_Action_Func[Game_State]();
-	}
+        Switch_Alpha += 0.04f;
+    } else {
+        Game_State = Switch_Dst;
+        Game_Action_Func[Game_State]();
+    }
     Game_Process_Func[Switch_Src]();
 }
 
 void Game_Process_Menu() {
-	glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 void Game_Process_Level() {
-    
+
     glutPostRedisplay();
 }
 
@@ -103,9 +87,8 @@ void Game_Process_Play() {
     if (Turn == TURN_PLAYER)
         Player.Update();
     else {
-        for(c_Enemy *enemy : Enemy) {
+        for(c_Enemy *enemy : Enemy)
             enemy->Update();
-        }
         Enemy_Stt++;
         if (Enemy_Stt == 6)
             Turn = TURN_PLAYER;
@@ -114,7 +97,7 @@ void Game_Process_Play() {
     while (i != Particle.end()) {
         (*i)->Update();
         if ((*i)->Check_Outside()) {
-            // delete first
+            delete *i;
             i = Particle.erase(i);
         } else
             i++;
@@ -137,7 +120,7 @@ void Game_Process_Over() {
     while (i != Particle.end()) {
         (*i)->Update();
         if ((*i)->Check_Outside()) {
-            // delete first
+            delete *i;
             i = Particle.erase(i);
         } else
             i++;
@@ -160,55 +143,21 @@ void Game_Process_Reset() {
     glutPostRedisplay();
 }
 
-void Game_Process_Win() {
-	if (Game_State==GAME_WIN){
-		if (Game_Timer<20){
-			Game_Timer++;
-		}else{
-			Level_Current++;
-			Game_Timer=0;
-			Switch_Alpha = 0.0f;
-	        Switch_Src = Game_State;
-	        Switch_Dst = GAME_LEVEL;
-	        Game_State = GAME_SWITCH;
-		}
-	}
-	glutPostRedisplay();
-}
-
 // Action
 
-void Game_Action_Switch(){	
+void Game_Action_Switch() {
 }
 
-void Game_Action_Menu(){
-	
+void Game_Action_Menu() {
+
 }
 
-void Game_Action_Level(){
-	for (auto i:Enemy)
-		delete i;
-	Enemy.clear();
-    Load_Map();
-    Reload_Translate();
-    Switch_Alpha = 0.0f;
-    Switch_Src = Game_State;
-    Switch_Dst = GAME_PLAY;
-    Game_State = GAME_SWITCH;
-}
-
-void Game_Action_Play(){
-	
-}
-
-void Game_Action_Over(){
-	
-}
-
-void Game_Action_Reset(){
-	for (auto i:Enemy)
-		delete i;
+void Game_Action_Level() {
+    for (auto i : Enemy)
+        delete i;
     Enemy.clear();
+    for (auto i : Particle)
+        delete i;
     Particle.clear();
     Load_Map();
     Reload_Translate();
@@ -218,8 +167,27 @@ void Game_Action_Reset(){
     Game_State = GAME_SWITCH;
 }
 
-void Game_Action_Win(){
-	
+void Game_Action_Play() {
+
+}
+
+void Game_Action_Over() {
+
+}
+
+void Game_Action_Reset() {
+    for (auto i : Enemy)
+        delete i;
+    Enemy.clear();
+    for (auto i : Particle)
+        delete i;
+    Particle.clear();
+    Load_Map();
+    Reload_Translate();
+    Switch_Alpha = 0.0f;
+    Switch_Src = Game_State;
+    Switch_Dst = GAME_PLAY;
+    Game_State = GAME_SWITCH;
 }
 
 // Keyboard
@@ -230,6 +198,7 @@ void Game_Keyboard_None(GLubyte &key) {
 void Game_Keyboard_Menu(GLubyte &key) {
     switch(key) {
     case 13:
+        Play_Sound(Sound_Button);
         if (Control_Stt == 1) {
             if (Control_Type == 0) {
                 Page_Current--;
@@ -259,6 +228,11 @@ void Game_Keyboard_Menu(GLubyte &key) {
 void Game_Keyboard_Play(GLubyte &key) {
     switch(key) {
     case 27:
+        Game_Timer = 0;
+        Switch_Alpha = 0.0f;
+        Switch_Src = Game_State;
+        Switch_Dst = GAME_MENU;
+        Game_State = GAME_SWITCH;
         break;
     }
 }
